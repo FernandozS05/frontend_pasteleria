@@ -1,91 +1,70 @@
 <template>
-  <div>
-    <router-view></router-view>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="seccion-izquierda p-4 text-center">
-            <div id="degradado-rosa" class="d-flex align-items-center">
-              <img src="../../assets/Logo1.png" alt="Logo Pastelería" />
-              <h1 class="ml-2">Pastelería Zudey</h1>
-            </div>
-            <h2 class="mt-4">Iniciar Sesión</h2>
-            <p class="mb-4">
-              ¡Bienvenido de nuevo! Por favor, ingrese sus datos.
-            </p>
+  <div class="container position-absolute top-50 start-50 translate-middle">
+    <div class="row">
+      <div class="col-md-6 order-md-2 mt-5">
+        <img
+          src="../../assets/Imagen2.png"
+          alt="Imagen Pastelería"
+          class="img-fluid"
+        />
+      </div>
 
-            <form @submit.prevent="iniciarSesion">
-              <p class="text-danger">{{ loginError }}</p>
-              <div class="mb-3">
-                <input
-                  v-model="email"
-                  type="email"
-                  placeholder="Correo Electrónico"
-                  class="form-control mx-auto"
-                />
-              </div>
-
-              <div
-                v-if="emailInvalid && (emailTouched || emailDirty)"
-                class="text-danger"
-              >
-                <div v-if="emailErrors?.['required']">
-                  Es necesario ingresar un correo electrónico.
-                </div>
-                <div v-if="emailErrors?.['email']">
-                  El correo electrónico no es válido.
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <input
-                  v-model="password"
-                  type="password"
-                  placeholder="Contraseña"
-                  class="form-control mx-auto"
-                />
-              </div>
-
-              <div
-                v-if="passwordInvalid && (passwordTouched || passwordDirty)"
-                class="text-danger"
-              >
-                <div v-if="passwordErrors?.['required']">
-                  Es necesario ingresar una contraseña.
-                </div>
-              </div>
-
-              <div>
-                <label>
-                  <input type="checkbox" /> Recordar Contraseña
-                  <a href="#">¿Has olvidado tu contraseña?</a>
-                </label>
-              </div>
-              <button id="btn1" type="submit" class="btn btn-primary mt-3">
-                Iniciar Sesión
-              </button>
-            </form>
-            <p class="mt-4">
-              ¿No tienes una cuenta?
-              <router-link
-                to="/registro"
-                class="active"
-                aria-current="page"
-                id="a1"
-                >Registrarse</router-link
-              >
-            </p>
-          </div>
-        </div>
-
-        <div class="col-md-6 p-4">
-          <div class="seccion-derecha">
+      <div class="col-md-6 order-md-1 mt-5">
+        <div class="gradient-background p-3">
+          <div class="mb-3">
             <img
-              src="../../assets/Imagen1.png"
-              alt="Imagen Pastelería"
-              class="img-fluid w-100"
+              src="../../assets/Logo1.png"
+              alt="Logotipo Pastelería Zudey"
+              class="img-fluid logo"
             />
           </div>
+          <h2 class="text-center mb-2">Pastelería Zudey</h2>
+
+          <p class="text-center">Iniciar sesión</p>
+          <p class="text-center mb-4">
+            ¡Bienvenido de nuevo! Por favor ingrese sus datos.
+          </p>
+
+          <form>
+            <div class="mb-3">
+              <label for="correo" class="form-label">Correo</label>
+              <input
+                type="email"
+                class="form-control"
+                id="correo"
+                placeholder="Ingrese su correo"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="contrasena" class="form-label">Contraseña</label>
+              <input
+                type="password"
+                class="form-control"
+                id="contrasena"
+                placeholder="Ingrese su contraseña"
+              />
+            </div>
+
+            <div class="mb-3 form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="recordarContraseña"
+              />
+              <label class="form-check-label" for="recordarContraseña"
+                >Recordar contraseña</label
+              >
+              <a href="#" class="ml-2">¿Has olvidado la contraseña?</a>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <button class="btn btn-rose" type="button">Iniciar Sesión</button>
+              <router-link to="/registro" class="text-rose"
+                >¿No tienes una cuenta? Registrarse</router-link
+              >
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -94,54 +73,25 @@
 
 <script>
 export default {
-  data() {
-    return {
-      email: "",
-      password: "",
-      loginError: "",
-    };
-  },
-  computed: {
-    emailInvalid() {
-      return (
-        !this.email ||
-        ((this.emailTouched || this.emailDirty) &&
-          !!this.emailErrors?.["required"])
-      );
-    },
-    emailErrors() {
-      return this.emailErrors?.["email"];
-    },
-    emailTouched() {
-      return this.emailTouched;
-    },
-    emailDirty() {
-      return this.emailDirty;
-    },
-    passwordInvalid() {
-      return (
-        !this.password ||
-        ((this.passwordTouched || this.passwordDirty) &&
-          !!this.passwordErrors?.["required"])
-      );
-    },
-    passwordErrors() {
-      return this.passwordErrors?.["password"];
-    },
-    passwordTouched() {
-      return this.passwordTouched;
-    },
-    passwordDirty() {
-      return this.passwordDirty;
-    },
-  },
-  methods: {
-    iniciarSesion() {
-    },
-  },
+  name: "LoginUsuario",
 };
 </script>
 
 <style scoped>
+.gradient-background {
+  background: linear-gradient(to top, #ffffff, #ffc6d1);
+}
 
+.logo {
+  max-width: 100px;
+}
+
+.text-rose {
+  color: #fe8092;
+}
+
+.btn-rose {
+  background-color: #fe8092;
+  color: #ffffff;
+}
 </style>

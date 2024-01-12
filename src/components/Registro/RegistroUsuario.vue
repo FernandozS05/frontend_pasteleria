@@ -1,8 +1,7 @@
 <template>
   <div class="container position-absolute top-50 start-50 translate-middle">
     <div class="row">
-      <!-- Parte izquierda con imagen -->
-      <div class="col-md-6 order-md-1">
+      <div class="col-md-6 order-md-1 mt-5">
         <img
           src="../../assets/Imagen2.png"
           alt="Imagen Pastelería"
@@ -10,18 +9,16 @@
         />
       </div>
 
-      <!-- Parte derecha con degradado y formulario -->
-      <div class="col-md-6 order-md-2">
-        <div class="gradient-background">
-          <div class="text-center mb-4">
-            <!-- Logotipo y nombre de la pastelería -->
+      <div class="col-md-6 order-md-2 mt-5">
+        <div class="gradient-background p-3">
+          <div class="mb-3">
             <img
               src="../../assets/Logo1.png"
               alt="Logotipo Pastelería Zudey"
               class="img-fluid logo"
             />
-            <h2 class="text-white">Pastelería Zudey</h2>
           </div>
+          <h2 class="text-center mb-4">Pastelería Zudey</h2>
 
           <h3 class="text-center mb-4">Registrarse</h3>
           <p class="text-center mb-4">
@@ -71,9 +68,11 @@
               />
             </div>
 
-            <div class="d-grid gap-2">
-              <button class="btn btn-secondary" type="button">Cancelar</button>
-              <button class="btn btn-primary" type="button">Registrarse</button>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <button class="btn btn-outline-secondary text-rose" type="button">
+                Cancelar
+              </button>
+              <button class="btn btn-rose" type="button">Registrarse</button>
             </div>
           </form>
         </div>
@@ -91,10 +90,23 @@ export default {
 <style scoped>
 .gradient-background {
   background: linear-gradient(to top, #ffffff, #ffc6d1);
-  padding: 30px;
 }
 
 .logo {
   max-width: 100px;
+}
+
+.text-rose {
+  color: #fe8092;
+}
+
+.btn-outline-secondary {
+  color: #fe8092;
+  border-color: #fe8092;
+}
+
+.btn-rose {
+  background-color: #fe8092;
+  color: #ffffff;
 }
 </style>
