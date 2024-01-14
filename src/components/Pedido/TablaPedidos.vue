@@ -34,6 +34,7 @@
     <tbody>
       <tr v-for="(pedido, index) in pedidos" :key="index">
         <td class="d-flex">
+          <router-link :to="{ name: '/elementoPedido', params: { id: pedido.id } }"></router-link>
           <img
             class="img-fluid mx-2 align-self-start"
             src="../../assets/icono-pedido.png"

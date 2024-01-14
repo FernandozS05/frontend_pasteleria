@@ -15,12 +15,24 @@
               class="form-check-input"
               name="tipoEntrega"
               id="entregaSucursal"
-              checked
             />
             <label class="form-check-label" for="entregaSucursal">
               En la sucursal
             </label>
             <div>Dirección de la sucursal: 123 Calle Principal, Ciudad</div>
+          </div>
+          <div class="form-check">
+            <input
+              type="radio"
+              class="form-check-input"
+              name="tipoEntrega"
+              id="entregaDomicilio"
+              v-model="tipoEntrega"
+              value="Domicilio"
+            />
+            <label class="form-check-label" for="entregaDomicilio">
+              A domicilio
+            </label>
           </div>
 
           <h4 class="mt-4">Método de pago:</h4>
@@ -88,7 +100,9 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 
+const store = useStore();
 const date = ref(null);
 const router = useRouter();
 
@@ -97,14 +111,26 @@ const cancelar = () => {
 };
 
 const continuar = () => {
+  const tipoEntrega = document.querySelector(
+    'input[name="tipoEntrega"]:checked'
+  ).id;
+
   const metodoPago = document.querySelector(
     'input[name="metodoPago"]:checked'
   ).id;
 
-  if (metodoPago === "pagoTarjeta") {
+  store.commit("actualizarTipoEntrega", tipoEntrega);
+  store.commit("actualizarMetodoPago", metodoPago);
+
+  if (tipoEntrega === "entregaSucursal" && metodoPago === "pagoTarjeta") {
     router.push("/tarjeta");
-  } else {
+  } else if (
+    tipoEntrega === "entregaSucursal" &&
+    metodoPago === "otraFormaPago"
+  ) {
     router.push("/formato");
+  } else {
+    router.push("/direccion");
   }
 };
 </script>
