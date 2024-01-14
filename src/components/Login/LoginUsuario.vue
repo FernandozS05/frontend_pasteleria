@@ -25,11 +25,11 @@
             ¡Bienvenido de nuevo! Por favor ingrese sus datos.
           </p>
 
-          <form>
+          <form @submit.prevent="iniciarSesion">
             <div class="mb-3">
               <label for="correo" class="form-label">Correo</label>
               <input
-                type="email"
+                v-model="usuario"
                 class="form-control"
                 id="correo"
                 placeholder="Ingrese su correo"
@@ -39,6 +39,7 @@
             <div class="mb-3">
               <label for="contrasena" class="form-label">Contraseña</label>
               <input
+                v-model="contrasenia"
                 type="password"
                 class="form-control"
                 id="contrasena"
@@ -47,27 +48,24 @@
             </div>
 
             <div class="mb-3 form-check">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    id="recordarContraseña"
-                  />
-                  <label class="form-check-label" for="recordarContraseña"
-                    >Recordar contraseña</label
-                  >
-                </div>
-                <a href="#" class="text-purple">¿Has olvidado la contraseña?</a>
-              </div>
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="recordarContraseña"
+              />
+              <label class="form-check-label" for="recordarContraseña"
+                >Recordar contraseña</label
+              >
+              <a href="#" class="text-purple">¿Has olvidado la contraseña?</a>
             </div>
 
-            <div class="d-flex flex-column align-items-center mt-5">
-              <button class="btn btn-rose" type="button">Iniciar Sesión</button>
-              <div class="mt-3">
-                <span>¿No tienes una cuenta?</span>
-                <router-link to="/registro" class="text-purple ml-1">
-                  Regístrate</router-link
+            <div class="d-flex flex-column align-items-center mt-3">
+              <button type="submit" class="btn btn-rose mb-3 mt-3">
+                Iniciar Sesión
+              </button>
+              <div class="mb-3">
+                <router-link to="/registro" class="text-purple ml-1"
+                  >¿No tienes una cuenta? Registrarse</router-link
                 >
               </div>
             </div>
@@ -79,8 +77,90 @@
 </template>
 
 <script>
+import apiCliente from "@/config/ServidorCliente.js";
+import apiUsuario from "@/config/ServidorEmpleado";
+import axios from "axios";
+import { toast } from "vue3-toastify";
+import toastConf from "@/config/toast";
+
 export default {
   name: "LoginUsuario",
+  data() {
+    return {
+      usuario: "",
+      contrasenia: "",
+      tipo: "",
+      api: {},
+    };
+  },
+  methods: {
+    definirApi() {
+      if (this.usuario.includes("@")) {
+        // Si el nombre de usuario contiene '@', selecciona la API de cliente
+        this.tipo = "cliente";
+      } else {
+        // Si no, selecciona la API de usuario
+        this.tipo = "empresa";
+      }
+    },
+    iniciarSesion() {
+      this.definirApi();
+      const api = this.tipo === "cliente" ? apiCliente : apiUsuario;
+      const url = api.login;
+      const datos =
+        this.tipo === "cliente"
+          ? { email: this.usuario, contrasenia: this.contrasenia }
+          : { nombreUsuario: this.usuario, contraseña: this.contrasenia };
+      console.log(url);
+      // Usar toast.promise para mostrar un toast mientras la promesa está pendiente
+      toast
+        .promise(
+          axios.post(url, datos, { withCredentials: true }),
+          {
+            pending: "Iniciando sesión...", // Mensaje mientras la promesa está pendiente
+            success: "Inicio de sesión exitoso", // Mensaje cuando la promesa se resuelve con éxito
+            error: "No se pudo iniciar sesión", // Mensaje cuando la promesa es rechazada
+          },
+          toastConf
+        )
+        .then((respuesta) => {
+          // Puedes realizar acciones adicionales después de que la promesa se resuelva
+          // (opcional dependiendo de tus necesidades)
+          console.log("Inicio de sesión completado");
+
+          // Realizar acciones adicionales según la respuesta exitosa
+          if (respuesta.status === 200) {
+            console.log(respuesta.data);
+            const idUsuario = respuesta.data.id;
+            toast.success("Sesión iniciada correctamente!");
+            setTimeout(() => {
+              this.$emit("irAlCatalogo", idUsuario);
+            }, 2000);
+          }
+        })
+        .catch((error) => {
+          // Manejar errores de la petición
+          if (error.response) {
+            console.error("Mensaje del servidor:", error.response.data.error);
+
+            if (error.response.status === 401) {
+              toast.error("Contraseña incorrecta.");
+            }
+            if (error.response.status === 404) {
+              toast.error("Usuario no encontrado.", toastConf);
+            }
+          } else if (error.request) {
+            // La solicitud fue realizada, pero no se recibió respuesta
+            console.error("No se recibió respuesta del servidor");
+            toast.error("Error de red", toastConf);
+          } else {
+            // Algo sucedió al configurar la solicitud que desencadenó un error
+            console.error("Error de configuración de la solicitud", error);
+            toast.error("Error desconocido", toastConf);
+          }
+        });
+    },
+  },
 };
 </script>
 
