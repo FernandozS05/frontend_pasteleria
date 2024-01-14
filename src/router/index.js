@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import RegistroUsuarioView from '../views/Registro/RegistroUsuarioView.vue'
 import LoginUsuarioView from '@/views/Login/LoginUsuarioView.vue'
 import ProductoCatalogoView from '@/views/Producto/ProductoCatalogoView.vue'
@@ -7,15 +6,15 @@ import CatalogoPastelesView from '@/views/Catalogo/CatalogoPastelesView.vue'
 import DetallesPedidoView from '@/views/Pedido/DetallesPedidoView.vue'
 import PagoTarjetaView from '@/views/Pedido/PagoTarjetaView.vue'
 import PagoFormatoView from '@/views/Pedido/PagoFormatoView.vue'
-import TablaPedidosView from '@/views/Pedido/TablaPedidosView.vue'
 import FormularioDireccionView from '@/views/Pedido/FormularioDireccionView.vue'
 import ElementoPedidoView from '@/views/Pedido/ElementoPedidoView.vue'
+import PedidosView from '@/views/Pedido/PedidosView.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'login',
+    component: LoginUsuarioView
   },
   {
     path: '/registro',
@@ -34,7 +33,7 @@ const routes = [
   },
   {
     path: '/catalogo',
-    name: 'catalogo',
+    name: 'catalogoProductos',
     component: CatalogoPastelesView
   },
   {
@@ -53,9 +52,9 @@ const routes = [
     component: PagoFormatoView
   },
   {
-    path: '/tablaPedidos',
-    name: 'tablaPedidos',
-    component: TablaPedidosView
+    path: '/pedidos',
+    name: 'pedidosview',
+    component: PedidosView
   },
   {
     path: '/direccion',

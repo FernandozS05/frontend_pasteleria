@@ -3,28 +3,26 @@
     <thead>
       <tr>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Nombre/ID del pedido</p>
+          <p class="fs-5 fw-medium align-self-end">ID del pedido</p>
         </th>
         <th>
           <p class="fs-5 fw-medium align-self-end">Fecha de Pedido</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Cantidad</p>
+          <p class="fs-5 fw-medium align-self-end">Estado del pedido</p>
         </th>
         <th>
           <p class="fs-5 fw-medium align-self-end">Precio Total</p>
         </th>
+        
         <th>
-          <p class="fs-5 fw-medium align-self-end">Tipo de Entrega</p>
+          <p class="fs-5 fw-medium align-self-end">Entrega</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Estado del Pedido</p>
+          <p class="fs-5 fw-medium align-self-end">Pagos</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Información Adicional</p>
-        </th>
-        <th>
-          <p class="fs-5 fw-medium align-self-end">Editar</p>
+          <p class="fs-5 fw-medium align-self-end">Informacion</p>
         </th>
         <th>
           <p class="fs-5 fw-medium align-self-end">Cancelar</p>
@@ -34,33 +32,42 @@
     <tbody>
       <tr v-for="(pedido, index) in pedidos" :key="index">
         <td class="d-flex">
-          <router-link :to="{ name: '/elementoPedido', params: { id: pedido.id } }"></router-link>
+
           <img
             class="img-fluid mx-2 align-self-start"
             src="../../assets/icono-pedido.png"
             alt=""
           />
-          <p class="fs-5 align-self-end" :title="pedido.titulo">
-            {{ acortarTitulo(pedido.titulo) }}
+          <p class="fs-5 align-self-end">
+            {{ pedido.idPedido }}
           </p>
         </td>
         <td>
-          <p class="fs-5">{{ pedido.fecha_agenda }}</p>
+          <p class="fs-5">{{ pedido.fechaPedido.slice(0,10) }}</p>
         </td>
         <td>
-          <p class="fs-5">{{ pedido.cantidad }}</p>
+          <p class="fs-5">{{ pedido.estado }}</p>
         </td>
         <td>
-          <p class="fs-5">{{ pedido.precioTotal }}</p>
+          <p class="fs-5">{{ pedido.total }}</p>
         </td>
         <td>
-          <p class="fs-5">{{ pedido.tipoEntrega }}</p>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            @click="verEntrega(index)"
+          >
+            Ver
+          </button>
         </td>
         <td>
-          <p class="fs-5">{{ pedido.estadoPedido }}</p>
-        </td>
-        <td>
-          <p class="fs-5">{{ pedido.informacionAdicional }}</p>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            @click="verPagos(index)"
+          >
+            Ver
+          </button>
         </td>
         <td>
           <button
@@ -68,7 +75,7 @@
             class="btn btn-primary btn-sm"
             @click="editarPedido(index)"
           >
-            Editar
+            Detalles
           </button>
         </td>
         <td>

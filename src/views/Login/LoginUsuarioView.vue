@@ -1,29 +1,23 @@
 <template>
     <div class="login-usuario-view">
-      <LoginUsuario/>
+      <Login @irAlCatalogo="irAlCatalogo"/>
     </div>
   </template>
   
   <script>
   // @ is an alias to /src
-  import LoginUsuario from "@/components/Login/LoginUsuario.vue";
-  import { toast } from "vue3-toastify";
+  import Login from "@/components/Login/Login.vue";
   
   export default {
     name: "LoginUsuarioView",
     components: {
-        LoginUsuario,
+        Login,
     },
     methods: {
-      irAlCatalogo() {
+      irAlCatalogo(idUsuario) {
         this.$router.push("/catalogo");
+        localStorage.setItem('idUsuario', idUsuario);
       },
-      notify() {
-      toast("Wow so easy !", {
-        autoClose: 1000,
-        position: toast.POSITION.BOTTOM_RIGHT,
-      });
-    },
     },
   };
   </script>
