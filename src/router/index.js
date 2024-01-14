@@ -4,6 +4,10 @@ import RegistroUsuarioView from '../views/Registro/RegistroUsuarioView.vue'
 import LoginUsuarioView from '@/views/Login/LoginUsuarioView.vue'
 import ProductoCatalogoView from '@/views/Producto/ProductoCatalogoView.vue'
 import CatalogoPastelesView from '@/views/Catalogo/CatalogoPastelesView.vue'
+import DetallesPedidoView from '@/views/Pedido/DetallesPedidoView.vue'
+import PagoTarjetaView from '@/views/Pedido/PagoTarjetaView.vue'
+import PagoFormatoView from '@/views/Pedido/PagoFormatoView.vue'
+import TablaPedidosView from '@/views/Pedido/TablaPedidosView.vue'
 
 const routes = [
   {
@@ -30,6 +34,26 @@ const routes = [
     path: '/catalogo',
     name: 'catalogo',
     component: CatalogoPastelesView
+  },
+  {
+    path: '/pedido',
+    name: 'pedido',
+    component: DetallesPedidoView
+  },
+  {
+    path: '/tarjeta',
+    name: 'tarjeta',
+    component: PagoTarjetaView
+  },
+  {
+    path: '/formato',
+    name: 'formato',
+    component: PagoFormatoView
+  },
+  {
+    path: '/tablaPedidos',
+    name: 'tablaPedidos',
+    component: TablaPedidosView
   },
   {
     path: '/about',
