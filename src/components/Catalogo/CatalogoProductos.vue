@@ -109,7 +109,8 @@ export default {
           cantidad: this.cantidadProducto
         }
       ],
-      total: Math.round(this.precioSeleccionado * this.cantidadProducto)
+      total: Math.round(this.precioSeleccionado * this.cantidadProducto),
+      totalAnticipo: Math.round((this.precioSeleccionado * this.cantidadProducto)/2)
       };
 
       console.log(datos);
@@ -130,12 +131,12 @@ export default {
         // Realizar acciones adicionales según la respuesta exitosa
         if (respuesta.status === 200) {
           console.log(respuesta.data);
-          const idPedido = respuesta.data.id;
+          const idPedido = respuesta.data.idPedido;
           localStorage.setItem('idPedido', idPedido);
           toast.success('Registrado correctamente!');
           setTimeout(() => {
-            this.$router.push("/pedidos");
-          }, 10000);
+            this.$router.push("/registro-pedido");
+          }, 500);
           
         }
       }).catch((error) => {

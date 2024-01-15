@@ -10,6 +10,7 @@ import FormularioDireccionView from '@/views/Pedido/FormularioDireccionView.vue'
 import ElementoPedidoView from '@/views/Pedido/ElementoPedidoView.vue'
 import PedidosView from '@/views/Pedido/PedidosView.vue'
 
+
 const routes = [
   {
     path: '/',
@@ -65,6 +66,11 @@ const routes = [
     path: '/elementoPedido',
     name: 'elementoPedido',
     component: ElementoPedidoView
+  },
+  {
+    path: '/registro-pedido',
+    name: 'registroPedido',
+    component: DetallesPedidoView
   },
   {
     path: '/about',

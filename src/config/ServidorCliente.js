@@ -9,6 +9,9 @@
     registro: dominio + "/registro",
     consultarPago: dominio + "/pagos/",
     consultarEntrega: dominio + "/entregas/",
+    consultarAgenda: dominio + "/agenda/consultar",
+    registrarEntrega: dominio + "/entregas/registrar-entrega",
+    asignarEntrega: dominio + "/pedidos/",
  }
 
  export default apiCliente;
