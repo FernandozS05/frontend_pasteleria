@@ -89,7 +89,12 @@
 
 <script>
 export default {
+  name: "PagoTarjeta",
+  props: {
+    pedido: Object
+  },
   methods: {
+    
     redirigirATablaPedidos() {
       this.$router.push("/tablaPedidos");
     },

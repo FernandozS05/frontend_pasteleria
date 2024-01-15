@@ -13,6 +13,7 @@ import TablaVentasView from '@/views/Venta/TablaVentasView.vue'
 import ElementoVentaView from '@/views/Venta/ElementoVentaView.vue'
 import ReporteVentasView from '@/views/Venta/ReporteVentasView.vue'
 
+
 const routes = [
   {
     path: '/',
@@ -70,6 +71,7 @@ const routes = [
     component: ElementoPedidoView
   },
   {
+<<<<<<< HEAD
     path: '/tablaVentas',
     name: 'tablaVentas',
     component: TablaVentasView
@@ -83,6 +85,11 @@ const routes = [
     path: '/reportes',
     name: 'reportes',
     component: ReporteVentasView
+=======
+    path: '/registro-pedido',
+    name: 'registroPedido',
+    component: DetallesPedidoView
+>>>>>>> fc523d1ade031dd9acdacaece799ab0a7698dc75
   },
   {
     path: '/about',
