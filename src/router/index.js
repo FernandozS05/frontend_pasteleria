@@ -9,6 +9,9 @@ import PagoFormatoView from '@/views/Pedido/PagoFormatoView.vue'
 import FormularioDireccionView from '@/views/Pedido/FormularioDireccionView.vue'
 import ElementoPedidoView from '@/views/Pedido/ElementoPedidoView.vue'
 import PedidosView from '@/views/Pedido/PedidosView.vue'
+import TablaVentasView from '@/views/Venta/TablaVentasView.vue'
+import ElementoVentaView from '@/views/Venta/ElementoVentaView.vue'
+import ReporteVentasView from '@/views/Venta/ReporteVentasView.vue'
 
 const routes = [
   {
@@ -65,6 +68,21 @@ const routes = [
     path: '/elementoPedido',
     name: 'elementoPedido',
     component: ElementoPedidoView
+  },
+  {
+    path: '/tablaVentas',
+    name: 'tablaVentas',
+    component: TablaVentasView
+  },
+  {
+    path: '/elementoVenta',
+    name: 'elementoVenta',
+    component: ElementoVentaView
+  },
+  {
+    path: '/reportes',
+    name: 'reportes',
+    component: ReporteVentasView
   },
   {
     path: '/about',
