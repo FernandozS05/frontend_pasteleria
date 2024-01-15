@@ -6,6 +6,8 @@
     consultarProductos: dominio + "/productos/",
     registrarPedido: dominio + "/pedidos/registrar",
     listarPedidos: dominio + "/pedidos/",
+    consultarPago: dominio + "/pagos/",
+    consultarEntrega: dominio + "/entregas/",
  }
 
  export default apiCliente;

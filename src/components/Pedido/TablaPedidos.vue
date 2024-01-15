@@ -6,26 +6,19 @@
           <p class="fs-5 fw-medium align-self-end">ID del pedido</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Fecha de Pedido</p>
+          <p class="fs-5 fw-medium align-self-end">Realizado</p>
         </th>
         <th>
           <p class="fs-5 fw-medium align-self-end">Estado del pedido</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Precio Total</p>
-        </th>
-        
-        <th>
-          <p class="fs-5 fw-medium align-self-end">Entrega</p>
+          <p class="fs-5 fw-medium align-self-end">ID entrega</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Pagos</p>
+          <p class="fs-5 fw-medium align-self-end">ID pago liquidacion</p>
         </th>
         <th>
           <p class="fs-5 fw-medium align-self-end">Informacion</p>
-        </th>
-        <th>
-          <p class="fs-5 fw-medium align-self-end">Cancelar</p>
         </th>
       </tr>
     </thead>
@@ -49,44 +42,28 @@
           <p class="fs-5">{{ pedido.estado }}</p>
         </td>
         <td>
-          <p class="fs-5">{{ pedido.total }}</p>
+          <p class="fs-5">{{ pedido.idEntrega? pedido.idEntrega : "No disponible" }}</p>
         </td>
-        <td>
+        <td class="ps-5">
+          <p v-if="pedido.idPagoLiquidacion != null" class="fs-5">{{ pedido.idPagoLiquidacion }}</p>
+          <button v-else
+            type="button"
+            class="btn btn-primary btn-sm"
+            @click="pagarLiquidacion(index)"
+          >
+            Pagar
+          </button>
+        </td>
+        <td >
           <button
             type="button"
             class="btn btn-primary btn-sm"
-            @click="verEntrega(index)"
+            @click="verInfo(index)"
           >
-            Ver
+            Informacion
           </button>
         </td>
-        <td>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            @click="verPagos(index)"
-          >
-            Ver
-          </button>
-        </td>
-        <td>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            @click="editarPedido(index)"
-          >
-            Detalles
-          </button>
-        </td>
-        <td>
-          <button
-            type="button"
-            class="btn btn-danger btn-sm"
-            @click="CancelarPedido(index)"
-          >
-            Cancelar
-          </button>
-        </td>
+       
       </tr>
     </tbody>
   </table>
@@ -107,6 +84,10 @@ export default {
         return titulo.slice(0, longitudMaxima) + "...";
       }
       return titulo;
+    },
+    verInfo(index){
+      console.log("ver info: " + index);
+      this.$emit("info", index);
     },
     editarPedido(index) {
       this.$emit("editarPedido", index);

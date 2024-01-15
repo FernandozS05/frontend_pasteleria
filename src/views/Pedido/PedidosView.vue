@@ -7,7 +7,7 @@
       <BarraBusqueda class="col-6 align-items-center" :placeholder="Buscar" @filtrar="filtrarPedidos" />
     </div>
     <div class="row">
-      <TablaPedidos :key="updateKey" v-bind:pedidos="pedidosFiltrados" />
+      <TablaPedidos :key="updateKey" v-bind:pedidos="pedidosFiltrados" @info="verInformacion"/>
     </div>
     </div>
   </div>
@@ -22,6 +22,7 @@ import apiCliente from "@/config/ServidorCliente";
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import toastConf  from "@/config/toast";
+
 export default {
   name: "PedidosView",
   components: {
@@ -41,6 +42,12 @@ export default {
         autoClose: 1000,
         position: toast.POSITION.BOTTOM_RIGHT,
       });
+    },
+    verInformacion(index) {
+      console.log("ver la info")
+      const idPedido = this.pedidos[index].idPedido;
+      localStorage.setItem("idPedido", idPedido);
+      this.$router.push("/elementoPedido")
     },
     consultarPedidos(){
       const url = apiCliente.listarPedidos + `?cliente=${localStorage.getItem("idUsuario")}`;
