@@ -10,13 +10,13 @@
             <nav class="col-auto w-100">
                 <ul class="nav">
                     <li class="nav-item">
-                        <router-link to="/inicio" class="nav-link"><p class="fs-5 link">Inicio</p></router-link>
-                    </li>
-                    <li class="nav-item">
                         <router-link to="/catalogo" class="nav-link"><p class="fs-5 link">Catálogo</p></router-link>
                     </li>
                     <li class="nav-item">
                         <router-link to="/pedidos" class="nav-link"><p class="fs-5 link">Pedidos</p></router-link>
+                    </li>
+                    <li v-if="revisar()" class="nav-item">
+                        <router-link to="/reportes" class="nav-link"><p class="fs-5 link">Ventas</p></router-link>
                     </li>
                 </ul> 
             </nav>
@@ -34,6 +34,11 @@ export default {
     methods: {
         cerrarSesion(){
             this.$emit("cerrarSesion");
+        },
+        revisar(){
+            const idUsuario = localStorage.getItem("idUsuario");
+
+            return idUsuario < 100 ? true : false;
         }
     },
 };

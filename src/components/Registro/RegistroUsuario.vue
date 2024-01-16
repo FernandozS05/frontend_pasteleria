@@ -25,7 +25,7 @@
             Por favor, ingrese sus datos personales.
           </p>
 
-          <form>
+          <form @submit.prevent="registrarUsuario">
             <div class="mb-3">
               <label for="nombre" class="form-label">Nombre</label>
               <input
@@ -53,7 +53,7 @@
             <div class="mb-3">
               <label for="contraseña" class="form-label">Contraseña</label>
               <input
-                v-model="contraseña"
+                v-model="contrasenia"
                 type="password"
                 class="form-control"
                 id="contraseña"
@@ -82,11 +82,11 @@
                 class="btn btn-outline-secondary text-rose"
                 >Cancelar</router-link
               >
-              <button class="btn btn-rose" @click="registrarUsuario">
+              <button class="btn btn-rose" type="submit">
                 Registrarse
               </button>
             </div>
-          </form>git
+          </form>
         </div>
       </div>
     </div>
@@ -107,7 +107,7 @@ export default {
       tipo: "",
       telefono: "",
       email: "",
-      contraseña: "",
+      contrasenia: "",
     };
   },
   methods: {
@@ -130,7 +130,7 @@ export default {
       return correoValido;
     },
     validarContraseña() {
-      const contraseñaValida = /^(?=.*[A-Z]).{8,}$/.test(this.contraseña);
+      const contraseñaValida = /^(?=.*[A-Z]).{8,}$/.test(this.contrasenia);
       if (!contraseñaValida) {
         this.mostrarError(
           "Contraseña inválida. Debe contener al menos una mayúscula y tener al menos 8 caracteres."
@@ -165,36 +165,61 @@ export default {
         return;
       }
 
+      this.apellido = this.nombre.split(':')[1];
       const datos = {
         nombre: this.nombre,
         apellido: this.apellido,
         tipo: this.tipo,
         telefono: this.telefono,
         email: this.email,
-        contrasenia: this.contraseña,
+        contrasenia: this.contrasenia,
       };
-
-      try {
-        console.log("Datos del cliente:", datos);
-        const respuesta = await axios.post(
+      
+      toast
+        .promise(
+          axios.post(
           "http://localhost:3000/api/cliente/registro",
-          datos
-        );
+          datos, { withCredentials: true }),
+          {
+            pending: "Registrando usuario...", // Mensaje mientras la promesa está pendiente
+            success: "Registro exitoso", // Mensaje cuando la promesa se resuelve con éxito
+            error: "No se pudo registrar el usuario", // Mensaje cuando la promesa es rechazada
+          },
+          toastConf
+        )
+        .then((respuesta) => {
+          // Puedes realizar acciones adicionales después de que la promesa se resuelva
+          // (opcional dependiendo de tus necesidades)
+          console.log("Inicio de sesión completado");
 
-        if (respuesta.status === 200) {
-          console.log("Usuario registrado exitosamente");
-          toast.success("Registro exitoso. ¡Inicia sesión ahora!");
-          this.$router.push("/login");
-        } else {
-          console.error("Error al registrar usuario:", respuesta.data.error);
-          this.mostrarError("Error al registrar usuario. Inténtalo de nuevo.");
-        }
-      } catch (error) {
-        console.error("Error de red:", error);
-        this.mostrarError(
-          "Error de red al registrar usuario. Inténtalo de nuevo."
-        );
-      }
+          // Realizar acciones adicionales según la respuesta exitosa
+          if (respuesta.status === 200) {
+            toast.success("Registro exitoso. ¡Inicia sesión ahora!");
+            setTimeout(()=> {}, 1000)
+            this.$router.push("/login");
+          }
+        })
+        .catch((error) => {
+          // Manejar errores de la petición
+          if (error.response) {
+            console.error("Mensaje del servidor:", error.response.data.error);
+
+            if (error.response.status === 401) {
+              toast.error("Contraseña incorrecta.");
+            }
+            if (error.response.status === 404) {
+              toast.error("Usuario no encontrado.", toastConf);
+            }
+          } else if (error.request) {
+            // La solicitud fue realizada, pero no se recibió respuesta
+            console.error("No se recibió respuesta del servidor");
+            toast.error("Error de red", toastConf);
+          } else {
+            // Algo sucedió al configurar la solicitud que desencadenó un error
+            console.error("Error de configuración de la solicitud", error);
+            toast.error("Error desconocido", toastConf);
+          }
+        });
     },
     mostrarError(mensaje) {
       toast.error(mensaje, toastConf);

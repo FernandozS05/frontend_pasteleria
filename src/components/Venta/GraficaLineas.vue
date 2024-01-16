@@ -8,43 +8,57 @@
 import Chart from "chart.js/auto";
 
 export default {
-  mounted() {
-    const ctx = document.getElementById("lineChart");
-
-    const labels = [
-      "Lunes",
-      "Martes",
-      "Miércoles",
-      "Jueves",
-      "Viernes",
-      "Sábado",
-      "Domingo",
-    ];
-
-    const data = {
-      labels: labels,
-      datasets: [
-        {
-          label: "Ganancias",
-          data: [1200, 1500, 1800, 1000, 2000, 2500, 800],
-          fill: false,
-          borderColor: "rgba(255, 192, 203, 1)",
-          tension: 0.1,
-        },
-      ],
+  data() {
+    return {
+      chart: null,
     };
+  },
+  mounted() {
+    this.renderChart();
+  },
+  methods: {
+    renderChart() {
+      const ctx = document.getElementById("lineChart");
 
-    new Chart(ctx, {
-      type: "line",
-      data: data,
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
+      if (this.chart) {
+        this.chart.destroy();
+      }
+
+      const labels = [
+        "Lunes",
+        "Martes",
+      ];
+
+      const data = {
+        labels: labels,
+        datasets: [
+          {
+            label: "Ganancias",
+            data: [2430, 3250],
+            fill: false,
+            borderColor: "rgba(255, 192, 203, 1)",
+            tension: 0.1,
+          },
+        ],
+      };
+
+      this.chart = new Chart(ctx, {
+        type: "line",
+        data: data,
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
           },
         },
-      },
-    });
+      });
+    },
+  },
+  beforeUnmount() {
+    if (this.chart) {
+      this.chart.destroy();
+    }
   },
 };
 </script>

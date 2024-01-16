@@ -8,29 +8,48 @@
 import Chart from "chart.js/auto";
 
 export default {
-  mounted() {
-    const ctx = document.getElementById("pieChart");
-
-    const data = {
-      labels: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
-      datasets: [
-        {
-          label: "Ganancias",
-          data: [1200, 1500, 1800, 1000, 2000, 2500, 800],
-          backgroundColor: [
-            "rgba(255, 192, 203, 0.5)",
-            "rgba(255, 192, 203, 0.8)",
-            "rgba(255, 192, 203, 1)",
-          ],
-          hoverOffset: 4,
-        },
-      ],
+  data() {
+    return {
+      chart: null,
     };
+  },
+  mounted() {
+    this.renderChart();
+  },
+  methods: {
+    renderChart() {
+      const ctx = document.getElementById("pieChart");
 
-    new Chart(ctx, {
-      type: "pie",
-      data: data,
-    });
+      if (this.chart) {
+        this.chart.destroy();
+      }
+
+      const data = {
+        labels: ["Lunes", "Martes"],
+        datasets: [
+          {
+            label: "Ganancias",
+            data: [2430, 3250],
+            backgroundColor: [
+              "rgba(255, 192, 203, 0.5)",
+              "rgba(255, 192, 203, 0.8)",
+              "rgba(255, 192, 203, 1)",
+            ],
+            hoverOffset: 4,
+          },
+        ],
+      };
+
+      this.chart = new Chart(ctx, {
+        type: "pie",
+        data: data,
+      });
+    },
+  },
+  beforeUnmount() {
+    if (this.chart) {
+      this.chart.destroy();
+    }
   },
 };
 </script>
