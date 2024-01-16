@@ -9,7 +9,7 @@ import PagoFormatoView from '@/views/Pedido/PagoFormatoView.vue'
 import FormularioDireccionView from '@/views/Pedido/FormularioDireccionView.vue'
 import ElementoPedidoView from '@/views/Pedido/ElementoPedidoView.vue'
 import PedidosView from '@/views/Pedido/PedidosView.vue'
-
+import TipoPagoView from '@/views/Pedido/TipoPagoView.vue'
 
 const routes = [
   {
@@ -71,6 +71,11 @@ const routes = [
     path: '/registro-pedido',
     name: 'registroPedido',
     component: DetallesPedidoView
+  },
+  {
+    path: '/tipo-pago',
+    name: 'TipoPago',
+    component: TipoPagoView
   },
   {
     path: '/about',

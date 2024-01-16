@@ -11,7 +11,7 @@
           <input type="radio" class="form-check-input" name="tipoEntrega" id="entregaSucursal" value="sucursal"
             v-model="tipoEntrega" />
           <label class="form-check-label" for="entregaSucursal">
-            Sucursal: Calle principal #5, Col. Prueba, Xalapa, Ver.
+            Sucursal: Calle principal #5, Col.Prueba, Xalapa, Ver.
           </label>
         </div>
         <div class="form-check">
@@ -23,11 +23,11 @@
         </div>
 
         <!-- Detalles de entrega a domicilio -->
-        <div v-if="tipoEntrega === 'domicilio'" id="detallesDomicilio" class="mb-3 mt-4">
+        <div v-if="this.tipoEntrega === 'domicilio'" id="detallesDomicilio" class="mb-3 mt-4">
           <label for="infoDomicilio" class="form-label">
             <p class="fs-5">Detalles de entrega a domicilio</p>
           </label>
-          <textarea class="form-control" id="infoDomicilio" rows="3"
+          <textarea v-model="domicilio" class="form-control" id="infoDomicilio" rows="3"
             placeholder="Calle, colonia, numero de exterior, etc."></textarea>
           <label for="infoReferencias" class="form-label">
             <p class="fs-5">Referencias domicilio</p>
@@ -56,6 +56,7 @@
         </div>
 
         <div class="d-flex justify-content-between align-items-center mt-3">
+          
           <button class="btn btn-outline-secondary text-rose" type="button" @click="cancelar">
             Cancelar
           </button>
@@ -119,6 +120,9 @@ data(){
   return {
     idEntrega: "",
     fecha: "",
+    tipoEntrega: "",
+    domicilio: "",
+    indicacionesExtra: ""
   }},
   methods: {
     consultarAgenda(){

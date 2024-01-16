@@ -12,6 +12,9 @@
     consultarAgenda: dominio + "/agenda/consultar",
     registrarEntrega: dominio + "/entregas/registrar-entrega",
     asignarEntrega: dominio + "/pedidos/",
+    generarPago: dominio + "/pedidos/pagos/generar-formato",
+    consultarCancelacion: dominio + "/pedidos/consultar-cancelacion/",
+    cancelarPedido: dominio + "/pedidos/cancelar-pedido/",
  }
 
  export default apiCliente;

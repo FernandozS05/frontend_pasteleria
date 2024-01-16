@@ -85,6 +85,9 @@ export default {
       }
       return titulo;
     },
+    pagarLiquidacion(index){
+      this.$emit("pagar", index);
+    },
     verInfo(index){
       console.log("ver info: " + index);
       this.$emit("info", index);

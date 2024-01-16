@@ -7,7 +7,7 @@
       <BarraBusqueda class="col-6 align-items-center" :placeholder="Buscar" @filtrar="filtrarPedidos" />
     </div>
     <div class="row">
-      <TablaPedidos :key="updateKey" v-bind:pedidos="pedidosFiltrados" @info="verInformacion"/>
+      <TablaPedidos :key="updateKey" v-bind:pedidos="pedidosFiltrados" @info="verInformacion" @pagar="irAPago"/>
     </div>
     </div>
   </div>
@@ -48,6 +48,11 @@ export default {
       const idPedido = this.pedidos[index].idPedido;
       localStorage.setItem("idPedido", idPedido);
       this.$router.push("/elementoPedido")
+    },
+    irAPago(index) {
+      const idPedido = this.pedidos[index].idPedido;
+      localStorage.setItem("idPedido", idPedido);
+      this.$router.push("/tipo-pago")
     },
     consultarPedidos(){
       const url = apiCliente.listarPedidos + `?cliente=${localStorage.getItem("idUsuario")}`;
