@@ -71,7 +71,6 @@ const routes = [
     component: ElementoPedidoView
   },
   {
-<<<<<<< HEAD
     path: '/tablaVentas',
     name: 'tablaVentas',
     component: TablaVentasView
@@ -84,12 +83,13 @@ const routes = [
   {
     path: '/reportes',
     name: 'reportes',
-    component: ReporteVentasView
-=======
+    component: ReporteVentasView,
+  },
+  {
+
     path: '/registro-pedido',
     name: 'registroPedido',
     component: DetallesPedidoView
->>>>>>> fc523d1ade031dd9acdacaece799ab0a7698dc75
   },
   {
     path: '/about',
