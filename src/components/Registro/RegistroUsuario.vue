@@ -86,7 +86,7 @@
                 Registrarse
               </button>
             </div>
-          </form>git
+          </form>
         </div>
       </div>
     </div>
