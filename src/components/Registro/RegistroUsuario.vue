@@ -14,11 +14,11 @@
           <div class="mb-3">
             <img
               src="../../assets/Logo1.png"
-              alt="Logotipo Pastelería Zudey"
+              alt="Logotipo Pastelería La Casa del Pastel"
               class="img-fluid logo"
             />
           </div>
-          <h2 class="text-center mb-4">Pastelería Zudey</h2>
+          <h2 class="text-center mb-4">Pastelería La Casa del Pastel</h2>
 
           <h3 class="text-center mb-4">Registrarse</h3>
           <p class="text-center mb-4">

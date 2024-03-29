@@ -14,11 +14,11 @@
           <div class="mb-3">
             <img
               src="../../assets/Logo1.png"
-              alt="Logotipo Pastelería Zudey"
+              alt="Logotipo Pastelería La Casa del Pastel"
               class="img-fluid logo"
             />
           </div>
-          <h2 class="text-center mb-2">Pastelería Zudey</h2>
+          <h2 class="text-center mb-2">Pastelería La Casa del Pastel</h2>
 
           <p class="text-center">Iniciar sesión</p>
           <p class="text-center mb-4">
@@ -47,16 +47,8 @@
               />
             </div>
 
-            <div class="mb-3 form-check">
-              <input
-                type="checkbox"
-                class="form-check-input"
-                id="recordarContraseña"
-              />
-              <label class="form-check-label" for="recordarContraseña"
-                >Recordar contraseña</label
-              >
-              <a href="#" class="text-purple">¿Has olvidado la contraseña?</a>
+            <div class="form-check">
+              <router-link to="/restablecer-contrasena" class="text-purple">¿Has olvidado la contraseña?</router-link>
             </div>
 
             <div class="d-flex flex-column align-items-center mt-3">

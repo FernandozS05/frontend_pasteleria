@@ -13,6 +13,8 @@ import TablaVentasView from '@/views/Venta/TablaVentasView.vue'
 import ElementoVentaView from '@/views/Venta/ElementoVentaView.vue'
 import ReporteVentasView from '@/views/Venta/ReporteVentasView.vue'
 import TipoPagoView from '@/views/Pedido/TipoPagoView.vue'
+import RestablecerContrasenaView from '@/views/RestablecerContrasena/RestablecerContrasenaView.vue'
+import CodigoSeguridadView from '@/views/RestablecerContrasena/CodigoSeguridadView.vue'
 
 const routes = [
   {
@@ -95,6 +97,16 @@ const routes = [
     path: '/tipo-pago',
     name: 'TipoPago',
     component: TipoPagoView
+  },
+  {
+    path: '/restablecer-contrasena',
+    name: 'RestablecerContrasena',
+    component: RestablecerContrasenaView
+  },
+  {
+    path: '/codigo-seguridad',
+    name: 'CodigoSeguridad',
+    component: CodigoSeguridadView
   },
   {
     path: '/about',

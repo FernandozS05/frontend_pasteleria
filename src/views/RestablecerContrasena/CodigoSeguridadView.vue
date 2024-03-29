@@ -1,23 +1,20 @@
 <template>
-  <div class="registro-usuario-view">
-    <RegistroUsuario/>
+  <div class="codigo-seguridad-view">
+    <CodigoSeguridad />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import RegistroUsuario from "@/components/Registro/RegistroUsuario.vue";
+import CodigoSeguridad from "@/components/RestablecerContrasena/CodigoSeguridad.vue";
 import { toast } from "vue3-toastify";
 
 export default {
-  name: "RegistroUsuarioView",
+  name: "CodigoSeguridadView",
   components: {
-    RegistroUsuario,
+    CodigoSeguridad,
   },
   methods: {
-    irAlCatalogo() {
-      this.$router.push("/catalogo");
-    },
     notify() {
       toast("Wow so easy !", {
         autoClose: 1000,
