@@ -15,6 +15,9 @@ import ReporteVentasView from '@/views/Venta/ReporteVentasView.vue'
 import TipoPagoView from '@/views/Pedido/TipoPagoView.vue'
 import RestablecerContrasenaView from '@/views/RestablecerContrasena/RestablecerContrasenaView.vue'
 import CodigoSeguridadView from '@/views/RestablecerContrasena/CodigoSeguridadView.vue'
+import FormularioInsumoView from '@/views/Inventario/FormularioInsumoView.vue'
+import ListadoInsumoView from '@/views/Inventario/ListadoInsumoView.vue'
+import ListadoEntregasView from '@/views/Entregas/ListadoEntregasView.vue'
 
 const routes = [
   {
@@ -107,6 +110,21 @@ const routes = [
     path: '/codigo-seguridad',
     name: 'CodigoSeguridad',
     component: CodigoSeguridadView
+  },
+  {
+    path: '/formulario-insumo',
+    name: 'FormularioInsumo',
+    component: FormularioInsumoView
+  },
+  {
+    path: '/listado-insumo',
+    name: 'ListadoInsumo',
+    component: ListadoInsumoView
+  },
+  {
+    path: '/listado-entregas',
+    name: 'ListadoEntregas',
+    component: ListadoEntregasView
   },
   {
     path: '/about',
