@@ -18,6 +18,7 @@ import CodigoSeguridadView from '@/views/RestablecerContrasena/CodigoSeguridadVi
 import FormularioInsumoView from '@/views/Inventario/FormularioInsumoView.vue'
 import ListadoInsumoView from '@/views/Inventario/ListadoInsumoView.vue'
 import ListadoEntregasView from '@/views/Entregas/ListadoEntregasView.vue'
+import CambiarContrasenaView from '@/views/RestablecerContrasena/CambiarContrasenaView.vue'
 
 const routes = [
   {
@@ -110,6 +111,11 @@ const routes = [
     path: '/codigo-seguridad',
     name: 'CodigoSeguridad',
     component: CodigoSeguridadView
+  },
+  {
+    path: '/cambiar-contrasena',
+    name: 'CambiarContrasena',
+    component: CambiarContrasenaView
   },
   {
     path: '/formulario-insumo',

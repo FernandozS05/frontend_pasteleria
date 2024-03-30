@@ -51,7 +51,7 @@ export default {
         );
         return;
       }
-      this.$router.push("");
+      this.$router.push("/cambiar-contrasena");
     },
     cerrarModal() {
       this.$emit("cerrar");
