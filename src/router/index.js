@@ -19,6 +19,7 @@ import FormularioInsumoView from '@/views/Inventario/FormularioInsumoView.vue'
 import ListadoInsumoView from '@/views/Inventario/ListadoInsumoView.vue'
 import ListadoEntregasView from '@/views/Entregas/ListadoEntregasView.vue'
 import CambiarContrasenaView from '@/views/RestablecerContrasena/CambiarContrasenaView.vue'
+import CambiarContrasenaEmpleadoView from '@/views/RestablecerContrasena/CambiarContrasenaEmpleadoView.vue'
 
 const routes = [
   {
@@ -116,6 +117,11 @@ const routes = [
     path: '/cambiar-contrasena',
     name: 'CambiarContrasena',
     component: CambiarContrasenaView
+  },
+  {
+    path: '/cambiar-contrasena-empleado',
+    name: 'CambiarContrasenaEmpleado',
+    component: CambiarContrasenaEmpleadoView
   },
   {
     path: '/formulario-insumo',
