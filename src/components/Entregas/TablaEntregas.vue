@@ -81,13 +81,22 @@
 
 <script>
 export default {
-  name: "TablaEntregas",
-  props: {},
-  data() {
-    return {};
-  },
-  methods: {},
-};
+    name: "TablaEntregas",
+    props: {
+      entregas: {
+        type: Array,
+        default: () => [],
+      },
+    },
+    methods: {
+      editarEntrega() {
+        this.$router.push("/modificar-entrega");
+      },
+      eliminarEntrega() {
+  
+      },
+    },
+  };
 </script>
 
 <style scoped>
@@ -117,10 +126,5 @@ td {
 
 .table {
   background-color: #fe8092;
-}
-
-.table th p,
-.table td p {
-  color: #ffffff;
 }
 </style>

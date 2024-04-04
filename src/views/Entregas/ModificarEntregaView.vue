@@ -1,0 +1,27 @@
+<template>
+    <div class="modificar-entrega-view">
+      <ModificarEntrega />
+    </div>
+  </template>
+  
+  <script>
+  // @ is an alias to /src
+  import ModificarEntrega from "../../components/Entregas/ModificarEntrega.vue";
+  import { toast } from "vue3-toastify";
+  
+  export default {
+    name: "ModificarEntregaView",
+    components: {
+      ModificarEntrega,
+    },
+    methods: {
+      notify() {
+        toast("Wow so easy !", {
+          autoClose: 1000,
+          position: toast.POSITION.BOTTOM_RIGHT,
+        });
+      },
+    },
+  };
+  </script>
+  

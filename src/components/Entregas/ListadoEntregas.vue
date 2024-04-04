@@ -39,7 +39,7 @@
 
 <script>
 import BarraBusqueda from "../Barras/BarraBusqueda.vue";
-import TablaEntregas from "../Inventario/TablaInsumo.vue";
+import TablaEntregas from "../Entregas/TablaEntregas.vue";
 export default {
   name: "ListadoEntregas",
   components: {
@@ -51,8 +51,10 @@ export default {
   },
   methods: {
     editarEntrega() {
+      this.$router.push("/modificar-entrega");
     },
     eliminarEntrega() {
+      
     },
   },
 };

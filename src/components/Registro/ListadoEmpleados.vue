@@ -4,13 +4,13 @@
       class="row justify-content-between align-items-center fondo-encabezado"
     >
       <div class="col-6">
-        <p class="fs-4 lh-1 pt-2">Administrar Insumos</p>
+        <p class="fs-4 lh-1 pt-2">Administrar Empleados</p>
       </div>
       <div class="col-6">
         <button
           type="button"
           class="btn btn-success boton-agregar d-flex align-items-center justify-content-evenly text-center p-1 boton-hover"
-          @click="nuevoInsumo"
+          @click="nuevoEmpleado"
         >
           <img
             class="img-fluid px-1"
@@ -34,20 +34,20 @@
       >
         <div class="row">
           <p class="col-6 fs-4 align-items-start fw-medium subtitulo">
-            Insumos Registrados
+            Empleados Registrados
             <BarraBusqueda
               class="col-6 align-items-center"
               :placeholder="Buscar"
-              @filtrar="filtrarInsumosTexto"
+              @filtrar="filtrarEmpleadosTexto"
             />
           </p>
         </div>
         <div class="row p-3">
-          <TablaInsumo
+          <TablaEmpleados
             class="col-12 border border-3 rounded"
-            :insumos="insumosFiltrados"
-            @editarInsumo="editarInsumo"
-            @eliminarInsumo="eliminarInsumo"
+            :empleados="empleadosFiltrados"
+            @editarEmpleado="editarEmpleado"
+            @eliminarEmpleado="eliminarEmpleado"
           />
         </div>
       </div>
@@ -57,25 +57,25 @@
 
 <script>
 import BarraBusqueda from "../Barras/BarraBusqueda.vue";
-import TablaInsumo from "../Inventario/TablaInsumo.vue";
+import TablaEmpleados from "../Registro/TablaEmpleados.vue";
 export default {
-  name: "ListadoInsumo",
+  name: "ListadoEmpleados",
   components: {
     BarraBusqueda,
-    TablaInsumo,
+    TablaEmpleados,
   },
   data() {
     return {};
   },
   methods: {
-    nuevoInsumo() {
-      this.$router.push("/formulario-insumo");
+    nuevoEmpleado() {
+      this.$router.push("/registro-empleado");
     },
-    editarInsumo() {
-      this.$router.push("/modificar-insumo");
+    editarEmpleado() {
+      this.$router.push("/modificar-datos");
     },
-    eliminarInsumo() {
-      
+    eliminarEmpleado() {
+
     },
   },
 };

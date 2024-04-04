@@ -21,6 +21,10 @@ import ListadoEntregasView from '@/views/Entregas/ListadoEntregasView.vue'
 import CambiarContrasenaView from '@/views/RestablecerContrasena/CambiarContrasenaView.vue'
 import CambiarContrasenaEmpleadoView from '@/views/RestablecerContrasena/CambiarContrasenaEmpleadoView.vue'
 import RegistroEmpleadoView from '@/views/Registro/RegistroEmpleadoView.vue'
+import ListadoEmpleadosView from '@/views/Registro/ListadoEmpleadosView.vue'
+import ModificarDatosEmpleadoView from '@/views/Registro/ModificarDatosEmpleadoView.vue'
+import ModificarInsumoView from '@/views/Inventario/ModificarInsumoView.vue'
+import ModificarEntregaView from '@/views/Entregas/ModificarEntregaView.vue'
 
 const routes = [
   {
@@ -135,14 +139,34 @@ const routes = [
     component: ListadoInsumoView
   },
   {
+    path: '/modificar-insumo',
+    name: 'ModificarInsumo',
+    component: ModificarInsumoView
+  },
+  {
     path: '/listado-entregas',
     name: 'ListadoEntregas',
     component: ListadoEntregasView
   },
   {
+    path: '/modificar-entrega',
+    name: 'ModificarEntrega',
+    component: ModificarEntregaView
+  },
+  {
+    path: '/listado-empleados',
+    name: 'ListadoEmpleados',
+    component: ListadoEmpleadosView
+  },
+  {
     path: '/registro-empleado',
     name: 'RegistroEmpleado',
     component: RegistroEmpleadoView
+  },
+  {
+    path: '/modificar-datos',
+    name: 'ModificarDatos',
+    component: ModificarDatosEmpleadoView
   },
   {
     path: '/about',

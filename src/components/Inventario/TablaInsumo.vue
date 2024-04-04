@@ -89,7 +89,7 @@ export default {
   },
   methods: {
     editarInsumo() {
-
+      this.$router.push("/modificar-insumo");
     },
     eliminarInsumo() {
 

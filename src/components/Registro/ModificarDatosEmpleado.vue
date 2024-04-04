@@ -20,12 +20,12 @@
           </div>
           <h2 class="text-center mb-4">Pastelería La Casa del Pastel</h2>
 
-          <h3 class="text-center mb-4">Registrar Empleado</h3>
+          <h3 class="text-center mb-4">Modificar Datos del Empleado</h3>
           <p class="text-center mb-4">
-            Por favor, ingrese los datos personales del empleado.
+            Por favor, ingrese los nuevos datos personales del empleado.
           </p>
 
-          <form @submit.prevent="registrarEmpleado">
+          <form @submit.prevent="modificarEmpleado">
             <div class="mb-3">
               <label for="nombre" class="form-label">Nombre</label>
               <input
@@ -84,7 +84,7 @@
               >
                 Cancelar
               </button>
-              <button class="btn btn-rose" type="submit">Registrar</button>
+              <button class="btn btn-rose" type="submit">Guardar</button>
             </div>
           </form>
         </div>
@@ -98,7 +98,7 @@ import { toast } from "vue3-toastify";
 import toastConf from "@/config/toast";
 
 export default {
-  name: "RegistroEmpleado",
+  name: "ModificarDatosEmpleado",
   data() {
     return {
       nombre: "",
@@ -157,7 +157,7 @@ export default {
 
       return true;
     },
-    async registrarEmpleado() {
+    async modificarEmpleado() {
       if (
         !this.validarNombre() ||
         !this.validarCorreo() ||
@@ -183,9 +183,9 @@ export default {
             withCredentials: true,
           }),
           {
-            pending: "Registrando empleado...", // Mensaje mientras la promesa está pendiente
-            success: "Registro exitoso", // Mensaje cuando la promesa se resuelve con éxito
-            error: "No se pudo registrar el empleado", // Mensaje cuando la promesa es rechazada
+            pending: "Modificando empleado...", // Mensaje mientras la promesa está pendiente
+            success: "Modificación exitosa", // Mensaje cuando la promesa se resuelve con éxito
+            error: "No se pudieron modificar los datos del empleado", // Mensaje cuando la promesa es rechazada
           },
           toastConf
         )
