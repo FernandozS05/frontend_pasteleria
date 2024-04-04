@@ -20,6 +20,7 @@ import ListadoInsumoView from '@/views/Inventario/ListadoInsumoView.vue'
 import ListadoEntregasView from '@/views/Entregas/ListadoEntregasView.vue'
 import CambiarContrasenaView from '@/views/RestablecerContrasena/CambiarContrasenaView.vue'
 import CambiarContrasenaEmpleadoView from '@/views/RestablecerContrasena/CambiarContrasenaEmpleadoView.vue'
+import RegistroEmpleadoView from '@/views/Registro/RegistroEmpleadoView.vue'
 
 const routes = [
   {
@@ -137,6 +138,11 @@ const routes = [
     path: '/listado-entregas',
     name: 'ListadoEntregas',
     component: ListadoEntregasView
+  },
+  {
+    path: '/registro-empleado',
+    name: 'RegistroEmpleado',
+    component: RegistroEmpleadoView
   },
   {
     path: '/about',
