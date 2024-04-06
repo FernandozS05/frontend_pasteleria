@@ -8,6 +8,7 @@ const apiCliente = {
   actualizar: ruta + "/actualizar",
   obtenerCodigo: ruta + "/obtener-codigo",
   validarCodigo: ruta + "/validar-codigo",
+  cambiarContrasenia: ruta + "/cambiar-contrasenia",
   //Catalogo
   consultarCatalogo: ruta + "/catalogo/consultar",
   //Pedidos

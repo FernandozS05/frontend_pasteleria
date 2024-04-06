@@ -5,12 +5,7 @@
         <h2 class="text-center text-rose">Ingrese el código de seguridad</h2>
         <div class="form-group mt-4">
           <label for="codigo" class="form-label">Código de Seguridad</label>
-          <input
-            type="text"
-            class="form-control"
-            id="codigo"
-            v-model="codigo"
-          />
+          <input type="text" class="form-control" id="codigo" v-model="codigo" />
         </div>
         <div class="text-center mt-4">
           <button class="btn btn-outline-secondary me-3" @click="cancelar">
@@ -26,8 +21,10 @@
 </template>
 
 <script>
-import { toast } from "vue3-toastify";
 
+import Swal from "sweetalert2";
+import apiCliente from "@/config/ServidorCliente.js";
+import axios from "@/config/axios.js";
 export default {
   data() {
     return {
@@ -36,22 +33,52 @@ export default {
   },
   methods: {
     cancelar() {
-      this.$router.go(-1);
+      this.$router.back();
     },
     verificarCodigo() {
       if (this.codigo === "") {
-        toast.error("Por favor, ingrese el código antes de continuar.");
+        Swal.fire({
+          icon: "info",
+          title: "Ingrese el código de verificación",
+          text: "Por favor, ingrese el código de verificación que le fue proporcionado.",
+        });
         return;
       }
+      const url = apiCliente.validarCodigo;
+      const datos = {
+        codigo: this.codigo,
+        correo: localStorage.getItem("correoUsuario"),
+      };
 
-      const codigoCorrecto = "codigoCorrecto";
-      if (this.codigo !== codigoCorrecto) {
-        toast.error(
-          "El código ingresado es incorrecto. Por favor, verifíquelo y vuelva a intentarlo."
-        );
-        return;
-      }
-      this.$router.push("/cambiar-contrasena");
+      Swal.fire({
+        title: 'Verificando código...',
+        text: 'Por favor, espere.',
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false
+      });
+      axios.post(url, datos)
+        .then(() => {
+          Swal.close();
+          Swal.fire({
+            icon: 'success',
+            title: 'Código verificado',
+            text: 'El código ha sido verificado exitosamente.',
+          }).then(() => {
+            this.$router.push("/cambiar-contrasena");
+          });
+        })
+        .catch(() => {
+          Swal.close();
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'El código ingresado es incorrecto o ha expirado. Por favor, verifíquelo y vuelva a intentarlo.',
+          });
+        });
     },
     cerrarModal() {
       this.$emit("cerrar");

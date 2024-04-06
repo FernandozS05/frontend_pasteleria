@@ -2,21 +2,13 @@
   <div class="container position-absolute top-50 start-50 translate-middle">
     <div class="row">
       <div class="col-md-6 order-md-2 mt-5">
-        <img
-          src="../../assets/Imagen1.png"
-          alt="Imagen Pastelería"
-          class="img-fluid"
-        />
+        <img src="../../assets/Imagen1.png" alt="Imagen Pastelería" class="img-fluid" />
       </div>
 
       <div class="col-md-6 order-md-1 mt-5">
         <div class="gradient-background p-3">
           <div class="mb-3">
-            <img
-              src="../../assets/Logo1.png"
-              alt="Logotipo Pastelería La Casa del Pastel"
-              class="img-fluid logo"
-            />
+            <img src="../../assets/Logo1.png" alt="Logotipo Pastelería La Casa del Pastel" class="img-fluid logo" />
           </div>
           <h2 class="text-center mb-2">Pastelería La Casa del Pastel</h2>
 
@@ -28,27 +20,18 @@
           <form @submit.prevent="iniciarSesion">
             <div class="mb-3">
               <label for="correo" class="form-label">Correo</label>
-              <input
-                v-model="usuario"
-                class="form-control"
-                id="correo"
-                placeholder="Ingrese su correo"
-              />
+              <input v-model="usuario" class="form-control" id="correo" placeholder="Ingrese su correo" />
             </div>
 
             <div class="mb-3">
               <label for="contrasena" class="form-label">Contraseña</label>
-              <input
-                v-model="contrasenia"
-                type="password"
-                class="form-control"
-                id="contrasena"
-                placeholder="Ingrese su contraseña"
-              />
+              <input v-model="contrasenia" type="password" class="form-control" id="contrasena"
+                placeholder="Ingrese su contraseña" />
             </div>
 
             <div class="form-check">
-              <router-link to="/restablecer-contrasena" class="text-purple">¿Has olvidado la contraseña?</router-link>
+              <a  @click="irARestablecer" class="text-purple">¿Has olvidado la
+                contraseña?</a>
             </div>
 
             <div class="d-flex flex-column align-items-center mt-3">
@@ -56,9 +39,7 @@
                 Iniciar Sesión
               </button>
               <div class="mb-3">
-                <router-link to="/registro" class="text-purple ml-1"
-                  >¿No tienes una cuenta? Registrarse</router-link
-                >
+                <router-link to="/registro" class="text-purple ml-1">¿No tienes una cuenta? Registrarse</router-link>
               </div>
             </div>
           </form>
@@ -74,7 +55,7 @@ import apiEmpleado from "@/config/ServidorEmpleado";
 import axios from "@/config/axios.js";
 import { toast } from "vue3-toastify";
 import toastConf from "@/config/toast";
-
+import Swal from 'sweetalert2';
 export default {
   name: "LoginUsuario",
   data() {
@@ -88,7 +69,7 @@ export default {
   methods: {
     definirApi() {
       if (this.usuario.includes("@")) {
-        
+
         this.tipo = "cliente";
       } else {
         this.tipo = "empresa";
@@ -107,8 +88,8 @@ export default {
         .promise(
           axios.post(url, datos),
           {
-            pending: "Iniciando sesión...", 
-            success: "Inicio de sesión exitoso", 
+            pending: "Iniciando sesión...",
+            success: "Inicio de sesión exitoso",
             error: "No se pudo iniciar sesión",
           },
           toastConf
@@ -117,7 +98,7 @@ export default {
           if (respuesta.status === 200) {
             localStorage.setItem('tokenUsuario', respuesta.data.token);
             const idUsuario = respuesta.data.id;
-            
+
             toast.success("Sesión iniciada correctamente!");
             this.$emit("irAlCatalogo", idUsuario);
           }
@@ -139,6 +120,20 @@ export default {
           }
         });
     },
+    async irARestablecer() {
+      if (this.usuario == "") {
+        const { value: email } = await Swal.fire({
+          title: "Ingrese su correo",
+          input: "email",
+          inputLabel: "Ingrese el correo electronico con el que se registro.",
+          inputPlaceholder: "Ingrese su correo"
+        });
+        if (email) {
+          localStorage.setItem("correoUsuario", email);
+          this.$router.push("/restablecer-contrasena");
+        }
+      }
+    }
   },
 };
 </script>

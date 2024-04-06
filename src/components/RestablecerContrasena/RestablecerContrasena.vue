@@ -7,25 +7,13 @@
         <div class="mt-4">
           <p class="mb-3">¿Cómo quieres obtener tu código de seguridad?</p>
           <div class="form-check">
-            <input
-              type="radio"
-              id="correo"
-              class="form-check-input"
-              value="correo"
-              v-model="opcion"
-            />
+            <input type="radio" id="correo" class="form-check-input" value="correo" v-model="opcion" />
             <label for="correo" class="form-check-label">
               Enviar al correo <i class="bi bi-envelope-fill"></i>
             </label>
           </div>
           <div class="form-check">
-            <input
-              type="radio"
-              id="sms"
-              class="form-check-input"
-              value="sms"
-              v-model="opcion"
-            />
+            <input type="radio" id="sms" class="form-check-input" value="sms" v-model="opcion" />
             <label for="sms" class="form-check-label">
               Enviar un mensaje de texto SMS
               <i class="bi bi-chat-dots-fill"></i>
@@ -46,8 +34,9 @@
 </template>
 
 <script>
-import { toast } from "vue3-toastify";
-
+import apiCliente from "@/config/ServidorCliente.js";
+import axios from "@/config/axios.js";
+import Swal from 'sweetalert2';
 export default {
   data() {
     return {
@@ -56,15 +45,57 @@ export default {
   },
   methods: {
     cancelar() {
-      this.$router.go(-1);
+      this.$router.back();
     },
     enviarCodigo() {
-      if (this.opcion === "") {
-        toast.error("Por favor, seleccione una opción antes de continuar.");
-        return;
-      }
-      this.$router.push("/codigo-seguridad");
+  if (this.opcion === "") {
+    Swal.fire({
+      icon: "info",
+      title: "Seleccione una opción",
+      text: "Por favor seleccione un método para restablecer su contraseña.",
+    });
+    return;
+  }
+
+  const url = apiCliente.obtenerCodigo;
+  const datos = {
+    correo: localStorage.getItem("correoUsuario"),
+    metodo: this.opcion,
+  };
+
+  Swal.fire({
+    title: 'Enviando código...',
+    text: 'Por favor, espere.',
+    didOpen: () => {
+      Swal.showLoading(); 
     },
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    allowEnterKey: false
+  });
+  axios.post(url, datos)
+    .then(response => {
+      Swal.close();
+      if(response.status == 200){
+      Swal.fire({
+        icon: 'success',
+        title: 'Código enviado',
+        text: 'El código de verificación ha sido enviado exitosamente.',
+      }).then(() => {
+        this.$router.push("/codigo-seguridad");
+      });
+      }
+    })
+    .catch(() => {
+      Swal.close();
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema al enviar el código. Por favor, inténtelo de nuevo.',
+      });
+    });
+},
+
     cerrarModal() {
       this.$emit("cerrar");
     },

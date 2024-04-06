@@ -37,8 +37,9 @@
 </template>
 
 <script>
-import { toast } from "vue3-toastify";
-
+import Swal from "sweetalert2";
+import apiCliente from "@/config/ServidorCliente.js";
+import axios from "@/config/axios.js";
 export default {
   data() {
     return {
@@ -47,26 +48,77 @@ export default {
     };
   },
   methods: {
-    cambiarContrasenia() {
-      const contraseniaValida = /^(?=.*[A-Z]).{8,}$/.test(
-        this.nuevaContrasenia
-      );
+    validarContrasenia() {
+  const contraseniaValida = /^(?=.*[A-Z]).{8,}$/.test(this.nuevaContrasenia);
 
-      if (this.nuevaContrasenia !== this.confirmarContrasenia) {
-        toast.error("Las contraseñas no coinciden.");
-        return;
-      }
+  if (this.nuevaContrasenia !== this.confirmarContrasenia) {
+    Swal.fire({
+      icon: "error",
+      title: "Las contraseñas no coinciden",
+      text: "Por favor, asegúrate de que las contraseñas coincidan.",
+    });
+    this.nuevaContrasenia = "";
+    this.confirmarContrasenia = "";
+    return false;
+  }
 
-      if (!contraseniaValida) {
-        toast.error(
-          "La contraseña debe tener al menos 8 caracteres, incluyendo al menos una letra mayúscula."
-        );
-        return;
-      }
-      console.log("Contraseña cambiada correctamente.");
-      this.nuevaContrasenia = "";
-      this.confirmarContrasenia = "";
+  if (!contraseniaValida) {
+    Swal.fire({
+      icon: "error",
+      title: "Contraseña no válida",
+      text: "La contraseña debe tener al menos 8 caracteres, incluyendo al menos una letra mayúscula.",
+    });
+    this.nuevaContrasenia = "";
+    this.confirmarContrasenia = "";
+    return false;
+  }
+
+  return true;
+},
+cambiarContrasenia() {
+  if (!this.validarContrasenia()) return; 
+
+  const url = apiCliente.cambiarContrasenia;
+  const datos = {
+    correo: localStorage.getItem("correoUsuario"),
+    contrasenia: this.nuevaContrasenia,
+  };
+
+  Swal.fire({
+    title: 'Cambiando contraseña...',
+    text: 'Por favor, espere.',
+    didOpen: () => {
+      Swal.showLoading(); 
     },
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    allowEnterKey: false
+  });
+
+  axios.post(url, datos)
+    .then(() => {
+      Swal.close();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Contraseña cambiada',
+        text: 'Tu contraseña ha sido cambiada exitosamente.',
+      }).then(() => {
+        this.$router.push("/login");
+      });
+    })
+    .catch(() => {
+      
+      Swal.close();
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema al cambiar tu contraseña. Por favor, intenta nuevamente.',
+      });
+    });
+    this.$router.push("/login");
+},
+
   },
 };
 </script>
