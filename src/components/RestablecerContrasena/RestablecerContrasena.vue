@@ -46,8 +46,7 @@
 </template>
 
 <script>
-import { toast } from "vue3-toastify";
-
+import Swal from "sweetalert2";
 export default {
   data() {
     return {
@@ -60,7 +59,11 @@ export default {
     },
     enviarCodigo() {
       if (this.opcion === "") {
-        toast.error("Por favor, seleccione una opción antes de continuar.");
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Por favor, seleccione una opción antes de continuar.",
+        });
         return;
       }
       this.$router.push("/codigo-seguridad");

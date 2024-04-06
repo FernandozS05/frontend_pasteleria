@@ -1,4 +1,5 @@
 <template>
+  <div id="app">
   <table class="table">
     <thead>
       <tr>
@@ -76,6 +77,7 @@
       </tr>
     </tbody>
   </table>
+</div>
 </template>
 
 <script>
@@ -134,5 +136,10 @@ tbody td {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+#app {
+  max-width: 100%;
+  overflow-x:hidden;
 }
 </style>

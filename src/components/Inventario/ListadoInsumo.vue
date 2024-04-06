@@ -1,4 +1,5 @@
 <template>
+  <div id="app">
   <div>
     <div
       class="row justify-content-between align-items-center fondo-encabezado"
@@ -53,6 +54,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -111,5 +113,10 @@ export default {
 
 .logo-pasteleria {
   width: 120px;
+}
+
+#app {
+  max-width: 100%;
+  overflow-x:hidden;
 }
 </style>

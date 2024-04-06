@@ -1,4 +1,5 @@
 <template>
+  <div id="app">
   <div class="row justify-content-between align-items-center fondo-encabezado">
     <div class="col-12">
       <p class="fs-4 lh-1 pt-2">Administrar Entregas</p>
@@ -35,6 +36,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -76,5 +78,10 @@ body {
 
 .logo-pasteleria {
   width: 120px;
+}
+
+#app {
+  max-width: 100%;
+  overflow-x:hidden;
 }
 </style>

@@ -26,8 +26,7 @@
 </template>
 
 <script>
-import { toast } from "vue3-toastify";
-
+import Swal from "sweetalert2";
 export default {
   data() {
     return {
@@ -40,15 +39,21 @@ export default {
     },
     verificarCodigo() {
       if (this.codigo === "") {
-        toast.error("Por favor, ingrese el código antes de continuar.");
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Por favor, ingrese el código antes de continuar.",
+        });
         return;
       }
 
       const codigoCorrecto = "codigoCorrecto";
       if (this.codigo !== codigoCorrecto) {
-        toast.error(
-          "El código ingresado es incorrecto. Por favor, verifíquelo y vuelva a intentarlo."
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "El código ingresado es incorrecto. Por favor, verifíquelo y vuelva a intentarlo.",
+        });
         return;
       }
       this.$router.push("/cambiar-contrasena");

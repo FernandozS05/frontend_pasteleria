@@ -82,9 +82,7 @@
                 class="btn btn-outline-secondary text-rose"
                 >Cancelar</router-link
               >
-              <button class="btn btn-rose" type="submit">
-                Registrarse
-              </button>
+              <button class="btn btn-rose" type="submit">Registrarse</button>
             </div>
           </form>
         </div>
@@ -98,6 +96,7 @@ import axios from "@/config/axios.js";
 import { toast } from "vue3-toastify";
 import toastConf from "@/config/toast";
 import apiCliente from "@/config/ServidorCliente";
+import Swal from "sweetalert2";
 export default {
   name: "RegistroUsuario",
   data() {
@@ -108,51 +107,74 @@ export default {
       email: "",
       contrasenia: "",
     };
-
   },
   methods: {
     validarNombre() {
       const nombreValido = /^[a-zA-Z\s']{3,}$/.test(this.nombre);
       if (!nombreValido) {
-        this.mostrarError(
-          "Nombre inválido. Asegúrate de ingresar al menos 3 letras y sin números ni símbolos."
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Nombre inválido. Asegúrate de ingresar al menos 3 letras y sin números ni símbolos.",
+        });
       }
       return nombreValido;
     },
     validarCorreo() {
       const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
       if (!correoValido) {
-        this.mostrarError(
-          "Correo electrónico inválido. Ingresa un correo válido con formato usuario@dominio.com."
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Correo electrónico inválido. Ingresa un correo válido con formato usuario@dominio.com.",
+        });
       }
       return correoValido;
     },
     validarContraseña() {
       const contraseñaValida = /^(?=.*[A-Z]).{8,}$/.test(this.contrasenia);
       if (!contraseñaValida) {
-        this.mostrarError(
-          "Contraseña inválida. Debe contener al menos una mayúscula y tener al menos 8 caracteres."
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Contraseña inválida. Debe contener al menos una mayúscula y tener al menos 8 caracteres.",
+        });
       }
       return contraseñaValida;
     },
     validarTelefono() {
- 
-  const telefonoLimpio = this.telefono.replace(/[^0-9]/g, "");
+      Swal.fire({
+        icon: "question",
+        title: "Espera...",
+        text: "Validando teléfono...",
+        showConfirmButton: false,
+        timer: 1500,
+      });
 
-  
-  if (telefonoLimpio.length !== 10) {
-    this.mostrarError("Número de teléfono inválido. Debe contener exactamente 10 dígitos numéricos.");
-    return false;
-  }
+      const telefonoLimpio = this.telefono.replace(/[^0-9]/g, "");
 
-  return true;
-},
+      if (/^(\d)\1+$/.test(telefonoLimpio)) {
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Número de teléfono inválido. Ingresa un número válido que no sea una cadena repetitiva de un solo dígito.",
+        });
+        return false;
+      }
+
+      if (telefonoLimpio.length !== 10) {
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Número de teléfono inválido. Ingresa un número válido con exactamente 10 dígitos numéricos.",
+        });
+        return false;
+      }
+
+      return true;
+    },
 
     async registrarUsuario() {
-
       const url = apiCliente.registro;
       if (
         !this.validarNombre() ||
@@ -163,47 +185,75 @@ export default {
         return;
       }
 
-      this.apellido = this.nombre.split(':')[1];
+      this.apellido = this.nombre.split(":")[1];
       const datos = {
         nombre: this.nombre,
         telefono: this.telefono,
         email: this.email,
         contrasenia: this.contrasenia,
       };
-      
+
       toast
         .promise(
-          axios.post(
-          url,
-          datos),
+          axios.post(url, datos),
           {
-            pending: "Registrando usuario...", 
-            success: "Registro exitoso", 
-            error: "No se pudo registrar el usuario", 
+            pending: "Registrando usuario...",
+            success: "Registro exitoso",
+            error: "No se pudo registrar el usuario",
           },
           toastConf
         )
         .then((respuesta) => {
           if (respuesta.status === 200) {
-            toast.success("Registro exitoso. ¡Inicia sesión ahora!");
-            setTimeout(()=> {}, 1000)
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Registro exitoso. ¡Inicia sesión ahora!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setTimeout(() => {}, 1000);
             this.$router.push("/login");
           }
         })
         .catch((error) => {
           if (error.response) {
-            console.error("Mensaje del servidor:", error.response.data.error);
+            //console.error("Mensaje del servidor:", error.response.data.error);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Mensaje del servidor:", error.response.data.error),
+            });
 
             if (error.response.status === 401) {
-              toast.error("Contraseña incorrecta.");
+              Swal.fire({
+                icon: "error",
+                title: "Error...",
+                text: "Contraseña incorrecta.",
+              });
             }
             if (error.response.status === 404) {
-              toast.error("Usuario no encontrado.", toastConf);
+              //toast.error("Usuario no encontrado.", toastConf);
+              Swal.fire({
+                icon: "error",
+                title: "Error...",
+                text: ("Usuario no encontrado.", toastConf),
+              });
             }
           } else if (error.request) {
-            toast.error("Error de red", toastConf);
+            //toast.error("Error de red", toastConf);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Error de red", toastConf),
+            });
           } else {
-            toast.error("Error desconocido", toastConf);
+            //toast.error("Error desconocido", toastConf);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Error desconocido", toastConf),
+            });
           }
         });
     },

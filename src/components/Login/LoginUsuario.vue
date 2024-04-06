@@ -48,7 +48,9 @@
             </div>
 
             <div class="form-check">
-              <router-link to="/restablecer-contrasena" class="text-purple">¿Has olvidado la contraseña?</router-link>
+              <router-link to="/restablecer-contrasena" class="text-purple"
+                >¿Has olvidado la contraseña?</router-link
+              >
             </div>
 
             <div class="d-flex flex-column align-items-center mt-3">
@@ -57,7 +59,7 @@
               </button>
               <div class="mb-3">
                 <router-link to="/registro" class="text-purple ml-1"
-                  >¿No tienes una cuenta? Registrarse</router-link
+                  >¿No tienes una cuenta? Registrate</router-link
                 >
               </div>
             </div>
@@ -74,6 +76,7 @@ import apiEmpleado from "@/config/ServidorEmpleado";
 import axios from "@/config/axios.js";
 import { toast } from "vue3-toastify";
 import toastConf from "@/config/toast";
+import Swal from "sweetalert2";
 
 export default {
   name: "LoginUsuario",
@@ -88,7 +91,6 @@ export default {
   methods: {
     definirApi() {
       if (this.usuario.includes("@")) {
-        
         this.tipo = "cliente";
       } else {
         this.tipo = "empresa";
@@ -107,35 +109,67 @@ export default {
         .promise(
           axios.post(url, datos),
           {
-            pending: "Iniciando sesión...", 
-            success: "Inicio de sesión exitoso", 
+            pending: "Iniciando sesión...",
+            success: "Inicio de sesión exitoso",
             error: "No se pudo iniciar sesión",
           },
           toastConf
         )
         .then((respuesta) => {
           if (respuesta.status === 200) {
-            localStorage.setItem('tokenUsuario', respuesta.data.token);
+            localStorage.setItem("tokenUsuario", respuesta.data.token);
             const idUsuario = respuesta.data.id;
-            
+            localStorage.setItem("idUsuario", idUsuario);
+            localStorage.setItem("tipoUsuario", this.tipo);
             toast.success("Sesión iniciada correctamente!");
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Sesión iniciada correctamente!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
             this.$emit("irAlCatalogo", idUsuario);
           }
         })
         .catch((error) => {
           if (error.response) {
-            console.error("Mensaje del servidor:", error.response.data.error);
+            //console.error("Mensaje del servidor:", error.response.data.error);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Mensaje del servidor:", error.response.data.error),
+            });
 
             if (error.response.status === 401) {
-              toast.error("Contraseña incorrecta.");
+              Swal.fire({
+                icon: "error",
+                title: "Error...",
+                text: "Contraseña incorrecta.",
+              });
             }
             if (error.response.status === 404) {
-              toast.error("Usuario no encontrado.", toastConf);
+              //toast.error("Usuario no encontrado.", toastConf);
+              Swal.fire({
+                icon: "error",
+                title: "Error...",
+                text: ("Usuario no encontrado.", toastConf),
+              });
             }
           } else if (error.request) {
-            toast.error("Error de red", toastConf);
+            //toast.error("Error de red", toastConf);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Error de red", toastConf),
+            });
           } else {
-            toast.error("Error desconocido", toastConf);
+            //toast.error("Error desconocido", toastConf);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Error desconocido", toastConf),
+            });
           }
         });
     },

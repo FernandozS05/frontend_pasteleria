@@ -21,6 +21,7 @@
 <script>
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import Swal from "sweetalert2";
 
 export default {
   name: "BarraFecha",
@@ -38,15 +39,18 @@ export default {
           fin: this.fechaFin,
         };
         this.$emit("filtrar", rangoFechas);
-      }
-      else if (this.fechaInicio) {
+      } else if (this.fechaInicio) {
         const fecha = {
           inicio: this.fechaInicio,
           fin: this.fechaInicio,
         };
         this.$emit("filtrar", fecha);
       } else {
-        console.warn("Selecciona al menos una fecha para filtrar");
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Selecciona al menos una fecha para filtrar!",
+        });
       }
     },
   },

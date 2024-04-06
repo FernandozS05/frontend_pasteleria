@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { toast } from "vue3-toastify";
+import Swal from "sweetalert2";
 
 export default {
   data() {
@@ -53,17 +53,29 @@ export default {
       );
 
       if (this.nuevaContrasenia !== this.confirmarContrasenia) {
-        toast.error("Las contraseñas no coinciden.");
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Las contraseñas no coinciden.",
+        });
         return;
       }
 
       if (!contraseniaValida) {
-        toast.error(
-          "La contraseña debe tener al menos 8 caracteres, incluyendo al menos una letra mayúscula."
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "La contraseña debe tener al menos 8 caracteres, incluyendo al menos una letra mayúscula.",
+        });
         return;
       }
-      console.log("Contraseña cambiada correctamente.");
+      Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Contraseña cambiada correctamente.",
+            showConfirmButton: false,
+            timer: 1500,
+          });
       this.nuevaContrasenia = "";
       this.confirmarContrasenia = "";
     },

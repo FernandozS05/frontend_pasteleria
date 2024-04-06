@@ -96,7 +96,7 @@
 import axios from "axios";
 import { toast } from "vue3-toastify";
 import toastConf from "@/config/toast";
-
+import Swal from "sweetalert2";
 export default {
   name: "ModificarDatosEmpleado",
   data() {
@@ -116,42 +116,62 @@ export default {
     validarNombre() {
       const nombreValido = /^[a-zA-Z\s']{3,}$/.test(this.nombre);
       if (!nombreValido) {
-        this.mostrarError(
-          "Nombre inválido. Asegúrate de ingresar al menos 3 letras y sin números ni símbolos."
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Nombre inválido. Asegúrate de ingresar al menos 3 letras y sin números ni símbolos.",
+        });
       }
       return nombreValido;
     },
     validarCorreo() {
       const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
       if (!correoValido) {
-        this.mostrarError(
-          "Correo electrónico inválido. Ingresa un correo válido con formato usuario@dominio.com."
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Correo electrónico inválido. Ingresa un correo válido con formato usuario@dominio.com.",
+        });
       }
       return correoValido;
     },
     validarContraseña() {
       const contraseñaValida = /^(?=.*[A-Z]).{8,}$/.test(this.contrasenia);
       if (!contraseñaValida) {
-        this.mostrarError(
-          "Contraseña inválida. Debe contener al menos una mayúscula y tener al menos 8 caracteres."
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Contraseña inválida. Debe contener al menos una mayúscula y tener al menos 8 caracteres.",
+        });
       }
       return contraseñaValida;
     },
     validarTelefono() {
-      console.log("Validando teléfono...");
+      Swal.fire({
+        icon: "question",
+        title: "Espera...",
+        text: "Validando teléfono...",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+
       const telefonoLimpio = this.telefono.replace(/[^0-9]/g, "");
 
-      if (
-        telefonoLimpio.length !== 10 ||
-        !/^\d{10}$/.test(telefonoLimpio) ||
-        /^(.)\1+$/.test(telefonoLimpio)
-      ) {
-        this.mostrarError(
-          "Número de teléfono inválido. Ingresa un número válido con exactamente 10 dígitos numéricos y que no sea una cadena repetitiva de un solo dígito."
-        );
+      if (/^(\d)\1+$/.test(telefonoLimpio)) {
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Número de teléfono inválido. Ingresa un número válido que no sea una cadena repetitiva de un solo dígito.",
+        });
+        return false;
+      }
+
+      if (telefonoLimpio.length !== 10) {
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Número de teléfono inválido. Ingresa un número válido con exactamente 10 dígitos numéricos.",
+        });
         return false;
       }
 
@@ -192,11 +212,22 @@ export default {
         .then((respuesta) => {
           // Puedes realizar acciones adicionales después de que la promesa se resuelva
           // (opcional dependiendo de tus necesidades)
-          console.log("Inicio de sesión completado");
-
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Inicio de sesión completado",
+            showConfirmButton: false,
+            timer: 1500,
+          });
           // Realizar acciones adicionales según la respuesta exitosa
           if (respuesta.status === 200) {
-            toast.success("Registro exitoso. ¡Inicia sesión ahora!");
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Modificación exitosa. ¡Inicia sesión ahora!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
             setTimeout(() => {}, 1000);
             this.$router.push("/login");
           }
@@ -204,27 +235,57 @@ export default {
         .catch((error) => {
           // Manejar errores de la petición
           if (error.response) {
-            console.error("Mensaje del servidor:", error.response.data.error);
+            //console.error("Mensaje del servidor:", error.response.data.error);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Mensaje del servidor:", error.response.data.error),
+            });
 
             if (error.response.status === 401) {
-              toast.error("Contraseña incorrecta.");
+              Swal.fire({
+                icon: "error",
+                title: "Error...",
+                text: "Contraseña incorrecta.",
+              });
             }
             if (error.response.status === 404) {
-              toast.error("Empleado no encontrado.", toastConf);
+              //toast.error("Empleado no encontrado.", toastConf);
+              Swal.fire({
+                icon: "error",
+                title: "Error...",
+                text: ("Empleado no encontrado.", toastConf),
+              });
             }
           } else if (error.request) {
             // La solicitud fue realizada, pero no se recibió respuesta
-            console.error("No se recibió respuesta del servidor");
-            toast.error("Error de red", toastConf);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: "No se recibió respuesta del servidor.",
+            });
+            //toast.error("Error de red", toastConf);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Error de red", toastConf),
+            });
           } else {
             // Algo sucedió al configurar la solicitud que desencadenó un error
-            console.error("Error de configuración de la solicitud", error);
-            toast.error("Error desconocido", toastConf);
+            //console.error("Error de configuración de la solicitud", error);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Error de configuración de la solicitud", error),
+            });
+            //toast.error("Error desconocido", toastConf);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Error desconocido", toastConf),
+            });
           }
         });
-    },
-    mostrarError(mensaje) {
-      toast.error(mensaje, toastConf);
     },
   },
 };

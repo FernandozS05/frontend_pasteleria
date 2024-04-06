@@ -1,51 +1,63 @@
 <template>
-  <div id="row degradado-rosa" class="d-flex align-items-center degradado-rosa">
-    <img
-      class="col-1 img-fluid"
-      src="../../assets/Logo1.png"
-      alt="Logo Pastelería"
-    />
-    <p class="col-3 fs-2 ml-2">Pastelería La Casa del Pastel</p>
-    <div class="col-2 d-flex align-items-center p-1 mb-3 mb-2bg-opacity-10">
+  <div id="app">
+    <div id="row degradado-rosa" class="d-flex align-items-center degradado-rosa">
       <img
-        class="img-fluid float-start fs-4 me-2"
-        src="../../assets/icono_salir.png"
+        class="col-1 img-fluid"
+        src="../../assets/Logo1.png"
+        alt="Logo Pastelería"
       />
-      <li>
-        <a class="dropdown-item" href="#" @click="cerrarSesion"
-          ><p class="fs-6">Cerrar sesión</p></a
-        >
-      </li>
+      <p class="tit col-2 ml-2">La Casa del Pastel</p>
+      <div class="col-2 align-items-center">
+        <img
+          class="img-fluid float-start fs-4 me-2"
+          src="../../assets/icono_salir.png"
+        />
+        <li>
+          <a class="dropdown-item" href="#" @click="cerrarSesion"
+            ><p class="fs-6">Cerrar sesión</p></a
+          >
+        </li>
+      </div>
+      <nav class="col-auto w-100">
+        <ul class="nav">
+          <li v-if="tipoUsuarioEsCliente" class="nav-item">
+            <router-link to="/catalogo" class="nav-link"
+              ><p class="fs-5 link">Catálogo</p></router-link
+            >
+          </li>
+          <li v-if="tipoUsuarioEsEmpresa" class="nav-item">
+            <router-link to="/catalogo" class="nav-link"
+              ><p class="fs-5 link">Administrar Catálogo</p></router-link
+            >
+          </li>
+          <li v-if="tipoUsuarioEsEmpresa" class="nav-item">
+            <router-link to="/catalogo" class="nav-link"
+              ><p class="fs-5 link">Administrar Usuarios</p></router-link
+            >
+          </li>
+          <li v-if="tipoUsuarioEsEmpresa" class="nav-item">
+            <router-link to="/reportes" class="nav-link"
+              ><p class="fs-5 link">Inventario</p></router-link
+            >
+          </li>
+          <li v-if="tipoUsuarioEsEmpresa" class="nav-item">
+            <router-link to="/reportes" class="nav-link"
+              ><p class="fs-5 link">Empleados</p></router-link
+            >
+          </li>
+          <li v-if="tipoUsuarioEsCliente" class="nav-item">
+            <router-link to="/pedidos" class="nav-link"
+              ><p class="fs-5 link">Pedidos</p></router-link
+            >
+          </li>
+          <li v-if="tipoUsuarioEsEmpresa" class="nav-item">
+            <router-link to="/reportes" class="nav-link"
+              ><p class="fs-5 link">Ventas</p></router-link
+            >
+          </li>
+        </ul>
+      </nav>
     </div>
-    <nav class="col-auto w-100">
-      <ul class="nav">
-        <li class="nav-item">
-          <router-link to="/catalogo" class="nav-link"
-            ><p class="fs-5 link">Catálogo</p></router-link
-          >
-        </li>
-        <li v-if="revisar()" class="nav-item">
-          <router-link to="/reportes" class="nav-link"
-            ><p class="fs-5 link">Inventario</p></router-link
-          >
-        </li>
-        <li v-if="revisar()" class="nav-item">
-          <router-link to="/reportes" class="nav-link"
-            ><p class="fs-5 link">Empleados</p></router-link
-          >
-        </li>
-        <li class="nav-item">
-          <router-link to="/pedidos" class="nav-link"
-            ><p class="fs-5 link">Pedidos</p></router-link
-          >
-        </li>
-        <li v-if="revisar()" class="nav-item">
-          <router-link to="/reportes" class="nav-link"
-            ><p class="fs-5 link">Ventas</p></router-link
-          >
-        </li>
-      </ul>
-    </nav>
   </div>
 </template>
 
@@ -53,17 +65,32 @@
 export default {
   name: "BarraNavegacion",
   data() {
-    return {};
+    return {
+      
+    };
+  },
+  computed:{
+    tipoUsuarioEsCliente() {
+      return localStorage.getItem("tipoUsuario") === "cliente";
+    },
+    tipoUsuarioEsEmpresa() {
+      return localStorage.getItem("tipoUsuario") === "empresa";
+    },
   },
   methods: {
     cerrarSesion() {
-      localStorage.removeItem('tokenUsuario');
-      localStorage.removeItem('idUsuario');
+      localStorage.removeItem("tokenUsuario");
+      localStorage.removeItem("idUsuario");
       this.$router.push("/login");
     },
     revisar() {
-      const idUsuario = localStorage.getItem("idUsuario");      
-      return idUsuario < 100 ? false : true;
+      const tipoUsuario = localStorage.getItem("tipoUsuario");
+      if (tipoUsuario === "cliente") {
+        return false;
+      } else if (tipoUsuario === "empresa") {
+        return true;
+      }
+      return false;
     },
   },
 };
@@ -73,8 +100,6 @@ export default {
 .degradado-rosa {
   background: #ff9baf;
 }
-
-@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 
 body {
   font-family: "Poppins", sans-serif;
@@ -92,13 +117,17 @@ p {
 
 .link {
   color: white;
-  font-size: 1.1em;
+  font-size: 5px;
+  margin-bottom: 5px;
 }
 
-/* ---------------------------------------------------
-    SIDEBAR STYLE
------------------------------------------------------ */
-.link:hover {
+.tit {
   color: #000000;
+  font-size: larger;
+}
+
+#app {
+  max-width: 100%;
+  overflow-x:hidden;
 }
 </style>
