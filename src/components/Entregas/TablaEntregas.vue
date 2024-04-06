@@ -1,4 +1,5 @@
 <template>
+  <div id="app">
   <table class="table">
     <thead>
       <tr>
@@ -77,6 +78,7 @@
       </tr>
     </tbody>
   </table>
+</div>
 </template>
 
 <script>
@@ -126,5 +128,10 @@ td {
 
 .table {
   background-color: #fe8092;
+}
+
+#app {
+  max-width: 100%;
+  overflow-x:hidden;
 }
 </style>

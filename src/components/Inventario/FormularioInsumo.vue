@@ -1,4 +1,5 @@
 <template>
+  <div id="app">
   <div>
     <h4>Registrar Insumo</h4>
     <form
@@ -79,10 +80,11 @@
       </div>
     </form>
   </div>
+</div>
 </template>
 
 <script>
-import { toast } from "vue3-toastify";
+import Swal from "sweetalert2";
 
 export default {
   data() {
@@ -127,7 +129,11 @@ export default {
         console.log("Datos del formulario:", this.formulario);
         this.limpiarFormulario();
       } else {
-        toast.error("Por favor, complete todos los campos correctamente.");
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Por favor, complete todos los campos correctamente.",
+        });
       }
     },
     limpiarFormulario() {
@@ -174,5 +180,10 @@ export default {
 .btn-outline-secondary {
   color: #fe8092;
   border-color: #fe8092;
+}
+
+#app {
+  max-width: 100%;
+  overflow-x:hidden;
 }
 </style>

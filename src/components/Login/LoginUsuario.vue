@@ -90,33 +90,66 @@ export default {
           {
             pending: "Iniciando sesión...",
             success: "Inicio de sesión exitoso",
+            pending: "Iniciando sesión...",
+            success: "Inicio de sesión exitoso",
             error: "No se pudo iniciar sesión",
           },
           toastConf
         )
         .then((respuesta) => {
           if (respuesta.status === 200) {
-            localStorage.setItem('tokenUsuario', respuesta.data.token);
+            localStorage.setItem("tokenUsuario", respuesta.data.token);
             const idUsuario = respuesta.data.id;
 
             toast.success("Sesión iniciada correctamente!");
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Sesión iniciada correctamente!",
+              showConfirmButton: false,
+              timer: 1500,
+            });
             this.$emit("irAlCatalogo", idUsuario);
           }
         })
         .catch((error) => {
           if (error.response) {
-            console.error("Mensaje del servidor:", error.response.data.error);
+            //console.error("Mensaje del servidor:", error.response.data.error);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Mensaje del servidor:", error.response.data.error),
+            });
 
             if (error.response.status === 401) {
-              toast.error("Contraseña incorrecta.");
+              Swal.fire({
+                icon: "error",
+                title: "Error...",
+                text: "Contraseña incorrecta.",
+              });
             }
             if (error.response.status === 404) {
-              toast.error("Usuario no encontrado.", toastConf);
+              //toast.error("Usuario no encontrado.", toastConf);
+              Swal.fire({
+                icon: "error",
+                title: "Error...",
+                text: ("Usuario no encontrado.", toastConf),
+              });
             }
           } else if (error.request) {
-            toast.error("Error de red", toastConf);
+            //toast.error("Error de red", toastConf);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Error de red", toastConf),
+            });
           } else {
-            toast.error("Error desconocido", toastConf);
+            //toast.error("Error desconocido", toastConf);
+            Swal.fire({
+              icon: "error",
+              title: "Error...",
+              text: ("Error desconocido", toastConf),
+            });
           }
         });
     },

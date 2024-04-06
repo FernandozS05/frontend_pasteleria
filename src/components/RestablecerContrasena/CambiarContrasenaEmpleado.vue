@@ -51,8 +51,7 @@
   </template>
   
   <script>
-  import { toast } from "vue3-toastify";
-  
+  import Swal from "sweetalert2";
   export default {
     props: {
       nombreEmpleado: {
@@ -83,8 +82,14 @@
         this.nuevaContrasenia = contraseniaAleatoria;
       },
       guardarCambios() {
-        console.log("Nueva contraseña:", this.nuevaContrasenia);
-        toast.success("Contraseña cambiada correctamente.");
+        Swal.fire("Nueva contraseña:", this.nuevaContrasenia);
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Contraseña cambiada correctamente.",
+            showConfirmButton: false,
+            timer: 1500,
+          });
         this.nuevaContrasenia = "";
       }
     }

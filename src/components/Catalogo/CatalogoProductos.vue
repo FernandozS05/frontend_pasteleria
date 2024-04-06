@@ -1,29 +1,43 @@
 <template>
+  <div id="app">
   <div class="container d-flex">
     <div class="col-auto mostrador d-flex p-3" id="mostrador">
       <div class="row">
-        <ProductoCatalogo v-for="(producto, index) in productos" :key="index" :imagen="producto.imagen"
-          :nombre="producto.nombre" :descripcion="producto.descripcion" :precio="producto.precio"
-          @detalle="cargar(index)" />
+        <ProductoCatalogo
+          v-for="(producto, index) in productos"
+          :key="index"
+          :imagen="producto.imagen"
+          :nombre="producto.nombre"
+          :descripcion="producto.descripcion"
+          :precio="producto.precio"
+          @detalle="cargar(index)"
+        />
       </div>
     </div>
     <!-- CONTENEDOR DEL ITEM SELECCIONADO -->
-    <div class="col-auto seleccion border border-4 rounded mt-3 me-3" id="seleccion">
-      <div class="cerrar" @click="cerrar">
-        Cerrar
-      </div>
+    <div
+      class="col-auto seleccion border border-4 rounded mt-3 me-3"
+      id="seleccion"
+    >
+      <div class="cerrar" @click="cerrar">Cerrar</div>
       <div class="info">
-        <img class="img-fluid" v-bind:src="imagenSeleccionada" alt="">
+        <img class="img-fluid" v-bind:src="imagenSeleccionada" alt="" />
         <h2 id="modelo">{{ this.nombreSeleccionada }}</h2>
         <p id="descripcion">{{ this.descripcionSeleccionada }}</p>
 
-        <span class="precio" id="precio">{{ `$ ${this.precioSeleccionado}` }}</span>
+        <span class="precio" id="precio">{{
+          `$ ${this.precioSeleccionado}`
+        }}</span>
 
         <div class="row">
           <div class="row mb-3">
             <label for="selectorCantidad">Cantidad</label>
-            <select id="selectorCantidad" v-model="cantidadProducto" class="form-select form-select-sm"
-              aria-label="Small select example">
+            <select
+              id="selectorCantidad"
+              v-model="cantidadProducto"
+              class="form-select form-select-sm"
+              aria-label="Small select example"
+            >
               <option selected>Selecciona una cantidad</option>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -37,27 +51,30 @@
               <option value="10">10</option>
             </select>
           </div>
-          <button class="btn btn-primary boton" @click="registrarPedido">Realizar pedido</button>
+          <button class="btn btn-primary boton" @click="registrarPedido">
+            Realizar pedido
+          </button>
         </div>
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
 import ProductoCatalogo from "../Producto/ProductoCatalogo.vue";
 import apiCliente from "@/config/ServidorCliente";
-import axios from '@/config/axios.js';
-import { toast } from 'vue3-toastify';
+import axios from "@/config/axios.js";
+import { toast } from "vue3-toastify";
 import toastConf from "@/config/toast";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 export default {
   name: "CatalogoProductos",
   props: {
-    productos: Array
+    productos: Array,
   },
   components: {
-    ProductoCatalogo
+    ProductoCatalogo,
   },
   data() {
     return {
@@ -75,7 +92,6 @@ export default {
   },
   methods: {
     cargar(index) {
-
       const producto = this.productos[index];
 
       let mostrador = document.getElementById("mostrador");
@@ -98,28 +114,32 @@ export default {
       seleccion.style.opacity = "0";
     },
     revisar() {
-      const idUsuario = localStorage.getItem("idUsuario");
-      return idUsuario < 100 ? false : true;
+      const tipoUsuario = localStorage.getItem("tipoUsuario");
+      if (tipoUsuario === "cliente") {
+        return false;
+      } else if (tipoUsuario === "empresa") {
+        return true;
+      }
+      return false;
     },
+
     async obtenerNombreCliente() {
       const { value: nombre } = await Swal.fire({
-        title: "¿A nombre de quien se hará el pedido?",
+        title: "¿A nombre de quién se hará el pedido?",
         input: "text",
         inputLabel: "Nombre completo",
-        inputPlaceholder: "Ingresa el nombre de la persona"
+        inputPlaceholder: "Ingresa el nombre de la persona",
       });
       if (nombre) {
         return nombre;
       }
     },
     async registrarPedido() {
-
       let cliente = await this.obtenerNombreCliente();
-      if (!cliente)
-        return;
+      if (!cliente) return;
 
       const idUsuario = localStorage.getItem("idUsuario");
-      
+
       const url = apiCliente.registrarPedido;
       const datos = {
         usuario: idUsuario,
@@ -128,43 +148,67 @@ export default {
         productos: [
           {
             id: this.idSeleccionado,
-            cantidad: this.cantidadProducto
-          }
+            cantidad: this.cantidadProducto,
+          },
         ],
         total: Math.ceil(this.precioSeleccionado * this.cantidadProducto),
       };
 
-      toast.promise(
-        axios.post(url, datos, { withCredentials: true }),
-        {
-          pending: 'Registrando pedido...',
-          success: 'Pedido registrado correctamente.',
-          error: 'No se pudo registrar pedido',
-        }, toastConf
-      ).then((respuesta) => {
-        if (respuesta.status === 200) {
-          const idPedido = respuesta.data.id_pedido;
-          localStorage.setItem('idPedido', idPedido);
-          this.$router.push("/registro-pedido");
-        }
-      }).catch((error) => {
-        this.manejarError(error);
-      });
+      toast
+        .promise(
+          axios.post(url, datos, { withCredentials: true }),
+          {
+            pending: "Registrando pedido...",
+            success: "Pedido registrado correctamente.",
+            error: "No se pudo registrar pedido",
+          },
+          toastConf
+        )
+        .then((respuesta) => {
+          if (respuesta.status === 200) {
+            const idPedido = respuesta.data.id_pedido;
+            localStorage.setItem("idPedido", idPedido);
+            this.$router.push("/registro-pedido");
+          }
+        })
+        .catch((error) => {
+          this.manejarError(error);
+        });
     },
     manejarError(error) {
       if (error.response) {
         if (error.response.status === 401) {
           this.$router.push("/login");
-          toast.error('No autorizado.');
+          Swal.fire({
+            icon: "error",
+            title: "Error...",
+            text: "No autorizado.",
+          });
         } else if (error.response.status === 404) {
-          toast.error('Información no encontrada.');
+          Swal.fire({
+            icon: "error",
+            title: "Error...",
+            text: "Información no encontrada.",
+          });
         } else {
-          toast.error('Error en la solicitud.');
+          Swal.fire({
+            icon: "error",
+            title: "Error...",
+            text: "Error en la solicitud.",
+          });
         }
       } else if (error.request) {
-        toast.error('Error de red');
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Error de red.",
+        });
       } else {
-        toast.error('Error desconocido');
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Error desconocido.",
+        });
       }
     },
   },
@@ -175,13 +219,13 @@ export default {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;800&display=swap");
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Open Sans';
+  font-family: "Open Sans";
 }
 
 .contenido {
@@ -193,7 +237,7 @@ export default {
 
 .mostrador {
   width: 100%;
-  transition: .5s ease;
+  transition: 0.5s ease;
 }
 
 .mostrador .fila {
@@ -212,7 +256,7 @@ export default {
   margin: 0 10px;
   cursor: pointer;
   border-radius: 5px;
-  transition: .3s;
+  transition: 0.3s;
 }
 
 .mostrador .fila .item:hover {
@@ -236,7 +280,7 @@ export default {
 }
 
 .seleccion {
-  transition: .5s ease;
+  transition: 0.5s ease;
   opacity: 0;
   width: 0%;
   height: fit-content;
@@ -312,5 +356,10 @@ export default {
 
 .boton:hover {
   background-color: #fc2828;
+}
+
+#app {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 </style>

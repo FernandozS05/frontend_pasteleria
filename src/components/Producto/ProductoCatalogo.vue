@@ -1,4 +1,5 @@
 <template>
+  <div id="app">
   <div class="item mb-3 align-items-center border border-3 rounded" @click="detalle(this)">
     <div class="contenedor-foto">
       <img class="img-fluid" :src="imagen" alt="">
@@ -6,6 +7,7 @@
     <p class="delscripcion">{{this.nombre}}</p>
     <span class="precio">{{`$ ${this.precio}`}}</span>
   </div>
+</div>
 </template>
 
 <script>
@@ -68,5 +70,10 @@ img{
     color: #f85151;
     font-weight: bold;
     font-size: 20px;
+}
+
+#app {
+  max-width: 100%;
+  overflow-x:hidden;
 }
 </style>
