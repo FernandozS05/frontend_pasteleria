@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "@/config/axios.js";
 import { toast } from "vue3-toastify";
 import toastConf from "@/config/toast";
 import apiCliente from "@/config/ServidorCliente.js";
@@ -43,143 +43,100 @@ export default {
 
       const datos = {
         anticipo: (Math.round(parseInt(this.pedido.total) / 2)),
-        metodoPago: "Efectivo.",
+        metodo_pago: "Efectivo.",
         concepto: (this.pedido.estado == "Pendiente") ? "Pago anticipo." : "Pago liquidacion."
       }
       toast.promise(
-        axios.post(url, datos, { withCredentials: true, responseType: 'blob' }),
+        axios.post(url, datos, { responseType: 'blob' }),
         {
-          pending: 'Generando forma de pago ...', // Mensaje mientras la promesa está pendiente
-          success: 'Forma de pago generada.', // Mensaje cuando la promesa se resuelve con éxito
-          error: 'Error al generar forma de pago.', // Mensaje cuando la promesa es rechazada
+          pending: 'Generando forma de pago ...', 
+          success: 'Forma de pago generada.', 
+          error: 'Error al generar forma de pago.', 
         }, toastConf
       ).then(async (respuesta) => {
-        // Puedes realizar acciones adicionales después de que la promesa se resuelva
-        // (opcional dependiendo de tus necesidades)
-        console.log('Registro completado');
-
-        // Realizar acciones adicionales según la respuesta exitosa
+      
         if (respuesta.status === 200) {
           const blob = new Blob([respuesta.data], { type: 'application/pdf' });
-          console.log(blob);
-          // Usa FileSaver.js para descargar el archivo
+          
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
 
-          // Configura el enlace para descargar automáticamente el archivo
           a.href = url;
-          a.download = `Forma_pago_${this.pedido.idPedido}.pdf`;
-
-          // Añade el enlace al documento y simula un clic para iniciar la descarga
+          a.download = `Forma_pago_${this.pedido.id}.pdf`;
+         
           document.body.appendChild(a);
           a.click();
 
-          // Limpia y libera recursos
           window.URL.revokeObjectURL(url);
           document.body.removeChild(a);
 
-          console.log(respuesta.data) //
-          toast.success("Pago registrada correctamente.")
-
-          //this.$router.push("pedidos");
+          toast.success("Pago registrada correctamente.") 
         }
       }).catch((error) => {
-        // Manejar errores de la petición
-        if (error.response) {
-          console.error('Mensaje del servidor:', error.response.data.error);
-
-          if (error.response.status === 401) {
-            toast.error('No autorizado.');
-          }
-          if (error.response.status === 404) {
-            toast.error('Ruta no encontrada.');
-          }
-        } else if (error.request) {
-          // La solicitud fue realizada, pero no se recibió respuesta
-          console.error('No se recibió respuesta del servidor');
-          toast.error('Error de red', toastConf);
-        } else {
-          // Algo sucedió al configurar la solicitud que desencadenó un error
-          console.error('Error de configuración de la solicitud', error);
-          toast.error('Error desconocido', toastConf);
-        }
+        this.manejarError(error);
       });
     },
     registrarPago() {
-      const url = apiCliente.listarPedidos + `pagos/${this.pedido.idPedido}/registrar-pago`;
       let anticipado = false;
-      if(this.pedido.idPagoAnticipo != null){
+      if(this.pedido.id_anticipo != null){
         anticipado = true;
       }
+      const url = apiCliente.registrarPago + `${this.pedido.id}`;
       const datos = {
         monto: (Math.round(parseInt(this.pedido.total) / 2)),
         direccion: "Calle principal #5, Col.Prueba, Xalapa, Ver.",
         folio: this.folio,
-        totalRestante: parseInt(this.pedido.total) - (Math.round(parseInt(this.pedido.total) / 2)),
-        metodoPago: "Efectivo",
-        vendedor: "Juan Lopez Perez.",
+        total_restante: parseInt(this.pedido.total) - (Math.round(parseInt(this.pedido.total) / 2)),
+        metodo_pago: "Efectivo",
         sucursal: "Sucursal principal.",
         anticipado: anticipado
       };
-      console.log(datos);
       toast.promise(
-        axios.post(url, datos, { withCredentials: true, responseType: 'blob'} ),
+        axios.post(url, datos, {responseType: 'blob'} ),
         {
-          pending: 'Registrando pago...', // Mensaje mientras la promesa está pendiente
-          success: 'Pago registrado.', // Mensaje cuando la promesa se resuelve con éxito
-          error: 'Error al registrar pago.', // Mensaje cuando la promesa es rechazada
+          pending: 'Registrando pago...', 
+          success: 'Pago registrado.', 
+          error: 'Error al registrar pago.', 
         }, toastConf
       ).then(async (respuesta) => {
-        // Puedes realizar acciones adicionales después de que la promesa se resuelva
-        // (opcional dependiendo de tus necesidades)
-        console.log('Registro completado');
-
-        // Realizar acciones adicionales según la respuesta exitosa
         if (respuesta.status === 200) {
           const blob = new Blob([respuesta.data], { type: 'application/pdf' });
-          console.log(blob);
-          // Usa FileSaver.js para descargar el archivo
+
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
 
-          // Configura el enlace para descargar automáticamente el archivo
           a.href = url;
           a.download = 'nombre-del-archivo.pdf';
 
-          // Añade el enlace al documento y simula un clic para iniciar la descarga
           document.body.appendChild(a);
           a.click();
 
-          // Limpia y libera recursos
           window.URL.revokeObjectURL(url);
           document.body.removeChild(a);
 
-          console.log(respuesta.data) //
           toast.success("Pago registrada correctamente.")
 
           this.$router.push("/pedidos");
         }
       }).catch((error) => {
-        // Manejar errores de la petición
-        if (error.response) {
-          console.error('Mensaje del servidor:', error.response.data.error);
-
-          if (error.response.status === 401) {
-            toast.error('No autorizado.');
-          }
-          if (error.response.status === 404) {
-            toast.error('Ruta no encontrada.');
-          }
-        } else if (error.request) {
-          // La solicitud fue realizada, pero no se recibió respuesta
-          console.error('No se recibió respuesta del servidor');
-          toast.error('Error de red', toastConf);
-        } else {
-          // Algo sucedió al configurar la solicitud que desencadenó un error
-          console.error('Error de configuración de la solicitud', error);
-          toast.error('Error desconocido', toastConf);
-        }
+        this.manejarError(error);
       });
+    },
+    manejarError(error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          this.$router.push("/login");
+          toast.error('No autorizado.');
+        } else if (error.response.status === 404) {
+          toast.error('Información no encontrada.');
+        } else {
+          toast.error('Error en la solicitud.');
+        }
+      } else if (error.request) {
+        toast.error('Error de red');
+      } else {
+        toast.error('Error desconocido');
+      }
     },
     redirigirATablaPedidos() {
       this.$router.push("/tablaPedidos");

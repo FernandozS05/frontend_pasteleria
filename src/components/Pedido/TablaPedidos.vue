@@ -12,13 +12,13 @@
           <p class="fs-5 fw-medium align-self-end">Estado del pedido</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">ID entrega</p>
+          <p class="fs-5 fw-medium align-self-end">Fecha de entrega</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">ID pago liquidacion</p>
+          <p class="fs-5 fw-medium align-self-end">Pagos</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Informacion</p>
+          <p class="fs-5 fw-medium align-self-end">Detalles</p>
         </th>
       </tr>
     </thead>
@@ -32,24 +32,24 @@
             alt=""
           />
           <p class="fs-5 align-self-end">
-            {{ pedido.idPedido }}
+            {{ pedido.id }}
           </p>
         </td>
         <td>
-          <p class="fs-5">{{ pedido.fechaPedido.slice(0,10) }}</p>
+          <p class="fs-5">{{ pedido.fecha_realizado.slice(0,10) }}</p>
         </td>
         <td>
           <p class="fs-5">{{ pedido.estado }}</p>
         </td>
         <td>
-          <p class="fs-5">{{ pedido.idEntrega? pedido.idEntrega : "No disponible" }}</p>
+          <p class="fs-5">{{ obtenerFechaEntrega(pedido.id_entrega) }}</p>
         </td>
         <td class="ps-5">
-          <p v-if="pedido.idPagoLiquidacion != null" class="fs-5">{{ pedido.idPagoLiquidacion }}</p>
+          <p v-if="pedido.id_liquidacion != null" class="fs-5">No disponible</p>
           <button v-else
             type="button"
             class="btn btn-primary btn-sm"
-            @click="pagarLiquidacion(index)"
+            @click="pagar(index)"
           >
             Pagar
           </button>
@@ -60,7 +60,7 @@
             class="btn btn-primary btn-sm"
             @click="verInfo(index)"
           >
-            Informacion
+            Ver
           </button>
         </td>
        
@@ -70,13 +70,19 @@
 </template>
 
 <script>
+import apiCliente from "@/config/ServidorCliente";
+import { toast } from 'vue3-toastify';
+import axios from '@/config/axios.js';
 export default {
   name: "TablaPedidos",
   props: {
     pedidos: Array,
   },
   data() {
-    return {};
+    return {
+      fecha_entrega: "",
+      fechasDeEntrega: {},
+    };
   },
   methods: {
     acortarTitulo(titulo, longitudMaxima) {
@@ -85,7 +91,25 @@ export default {
       }
       return titulo;
     },
-    pagarLiquidacion(index){
+    async consultarEntrega(idEntrega) {
+      if (!idEntrega) {
+        this.fechasDeEntrega[idEntrega] = "No disponible";
+        return;
+      }
+      const url = apiCliente.detallesEntrega + idEntrega;
+      
+      try {
+        const respuesta = await axios.get(url);
+        this.fechasDeEntrega[idEntrega] = respuesta.data.fecha_entrega.slice(0,10);
+      } catch (error) {
+        this.manejarError(error);
+        this.fechasDeEntrega[idEntrega] = "Error al consultar";
+      }
+    },
+    obtenerFechaEntrega(idEntrega) {
+      return this.fechasDeEntrega[idEntrega] || "Consultando...";
+    },
+    pagar(index){
       this.$emit("pagar", index);
     },
     verInfo(index){
@@ -96,9 +120,40 @@ export default {
       this.$emit("editarPedido", index);
     },
     CancelarPedido(index) {
-      this.$emit("CancelarPedido", index);
+      this.$emit("cancelarPedido", index);
     },
+    manejarError(error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          this.$router.push("/login");
+          toast.error('No autorizado.');
+        } else if (error.response.status === 404) {
+          toast.error('Información no encontrada.');
+        } else {
+          toast.error('Error en la solicitud.');
+        }
+      } else if (error.request) {
+        toast.error('Error de red');
+      } else {
+        toast.error('Error desconocido');
+      }
+    },
+    cargarFechas(){
+      this.pedidos.forEach(pedido => {
+      this.consultarEntrega(pedido.id_entrega);
+    });
+    }
   },
+  mounted(){
+    this.cargarFechas();
+  },
+  watch: {
+  pedidos: {
+    handler: "cargarFechas",
+    deep: true,
+  },
+},
+
 };
 </script>
 

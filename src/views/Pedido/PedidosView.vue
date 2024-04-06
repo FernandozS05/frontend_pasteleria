@@ -14,12 +14,11 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import TablaPedidos from "@/components/Pedido/TablaPedidos.vue";
 import BarraBusqueda from "@/components/Barras/BarraBusqueda.vue";
 import BarraNavegacion from "@/components/Barras/BarraNavegacion.vue";
 import apiCliente from "@/config/ServidorCliente";
-import axios from 'axios';
+import axios from "@/config/axios.js";
 import { toast } from 'vue3-toastify';
 import toastConf  from "@/config/toast";
 
@@ -37,66 +36,57 @@ export default {
     }
   },
   methods: {
-    notify() {
-      toast("Wow so easy !", {
-        autoClose: 1000,
-        position: toast.POSITION.BOTTOM_RIGHT,
-      });
+    revisar() {
+      const idUsuario = localStorage.getItem("idUsuario");
+      return idUsuario < 100 ? false : true;
     },
     verInformacion(index) {
-      console.log("ver la info")
-      const idPedido = this.pedidos[index].idPedido;
+      const idPedido = this.pedidos[index].id;
       localStorage.setItem("idPedido", idPedido);
       this.$router.push("/elementoPedido")
     },
     irAPago(index) {
-      const idPedido = this.pedidos[index].idPedido;
+      const idPedido = this.pedidos[index].id;
       localStorage.setItem("idPedido", idPedido);
       this.$router.push("/tipo-pago")
     },
     consultarPedidos(){
-      const url = apiCliente.listarPedidos + `?cliente=${localStorage.getItem("idUsuario")}`;
-      
+      let url = apiCliente.listarPedidos;
+      if(!this.revisar())
+        url = url + `?cliente=${localStorage.getItem("idUsuario")}`;
+
       toast.promise(
-                axios.get(url, { withCredentials: true }),
+                axios.get(url),
                 {
-                    pending: 'Consultando pedidos...', // Mensaje mientras la promesa está pendiente
-                    success: 'Pedidos obtenidos.', // Mensaje cuando la promesa se resuelve con éxito
-                    error: 'No se pudo obtener los pedidos.', // Mensaje cuando la promesa es rechazada
+                    pending: 'Consultando pedidos...', 
+                    success: 'Pedidos obtenidos.', 
+                    error: 'No se pudo obtener los pedidos.'
                 }, toastConf
             ).then((respuesta) => {
-                // Puedes realizar acciones adicionales después de que la promesa se resuelva
-                // (opcional dependiendo de tus necesidades)
-                console.log('Consulta completada');
-
-                // Realizar acciones adicionales según la respuesta exitosa
                 if (respuesta.status === 200) {
-                    console.log(respuesta.data)
                     this.pedidos = respuesta.data;
                     this.pedidosFiltrados = this.pedidos;
                 }
             }).catch((error) => {
-                // Manejar errores de la petición
-                if (error.response) {
-                    console.error('Mensaje del servidor:', error.response.data.error);
-
-                    if (error.response.status === 401) {
-                        toast.error('No autorizado.', toastConf);
-                    }
-                    if (error.response.status === 404) {
-                        toast.error('Informacion no encontrada.', toastConf);
-                    }
-                } else if (error.request) {
-                    // La solicitud fue realizada, pero no se recibió respuesta
-                    console.error('No se recibió respuesta del servidor');
-                    toast.error('Error de red', toastConf);
-                } else {
-                    // Algo sucedió al configurar la solicitud que desencadenó un error
-                    console.error('Error de configuración de la solicitud', error);
-                    toast.error('Error desconocido', toastConf);
-                }
+                this.manejarError(error);
             });
-    }
+    },
+    manejarError(error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          this.$router.push("/login");
+          toast.error('No autorizado.');
+        } else if (error.response.status === 404) {
+          toast.error('Información no encontrada.');
+        } else {
+          toast.error('Error en la solicitud.');
+        }
+      } else if (error.request) {
+        toast.error('Error de red');
+      } else {
+        toast.error('Error desconocido');
+      }
+    },
   },
   mounted(){
     this.consultarPedidos();

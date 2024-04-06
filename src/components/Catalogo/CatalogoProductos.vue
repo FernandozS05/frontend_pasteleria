@@ -22,7 +22,8 @@
         <div class="row">
           <div class="row mb-3">
             <label for="selectorCantidad">Cantidad</label>
-            <select id="selectorCantidad" v-model="cantidadProducto" class="form-select form-select-sm" aria-label="Small select example">
+            <select id="selectorCantidad" v-model="cantidadProducto" class="form-select form-select-sm"
+              aria-label="Small select example">
               <option selected>Selecciona una cantidad</option>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -46,9 +47,10 @@
 <script>
 import ProductoCatalogo from "../Producto/ProductoCatalogo.vue";
 import apiCliente from "@/config/ServidorCliente";
-import axios from 'axios';
+import axios from '@/config/axios.js';
 import { toast } from 'vue3-toastify';
-import toastConf  from "@/config/toast";
+import toastConf from "@/config/toast";
+import Swal from 'sweetalert2';
 export default {
   name: "CatalogoProductos",
   props: {
@@ -61,37 +63,32 @@ export default {
     return {
       imagenProducto: "",
       nombre: "",
-      idSeleccionado : "",
+      idSeleccionado: "",
       nombreSeleccionada: "",
       descripcionSeleccionada: "",
       imagenSeleccionada: "",
       precioSeleccionado: "",
-      cantidadProducto: "",
+      nombreCliente: "",
+      cantidadProducto: "1",
       productosFiltrados: [],
     };
   },
   methods: {
-    buscarProducto() {
-    },
-    comprarProducto() {
-    },
     cargar(index) {
 
       const producto = this.productos[index];
 
       let mostrador = document.getElementById("mostrador");
       let seleccion = document.getElementById("seleccion");
-      this.idSeleccionado = producto.idProducto;
+      this.idSeleccionado = producto.id;
       this.nombreSeleccionada = producto.nombre;
       this.descripcionSeleccionada = producto.descripcion;
       this.precioSeleccionado = producto.precio;
       this.imagenSeleccionada = producto.imagen;
-       
 
       mostrador.style.width = "60%";
       seleccion.style.width = "40%";
       seleccion.style.opacity = "1";
-      //item.style.border = "2px solid red";
     },
     cerrar() {
       let mostrador = document.getElementById("mostrador");
@@ -100,67 +97,76 @@ export default {
       seleccion.style.width = "0%";
       seleccion.style.opacity = "0";
     },
-    registrarPedido(){
-      const idCliente = localStorage.getItem("idUsuario");
+    revisar() {
+      const idUsuario = localStorage.getItem("idUsuario");
+      return idUsuario < 100 ? false : true;
+    },
+    async obtenerNombreCliente() {
+      const { value: nombre } = await Swal.fire({
+        title: "¿A nombre de quien se hará el pedido?",
+        input: "text",
+        inputLabel: "Nombre completo",
+        inputPlaceholder: "Ingresa el nombre de la persona"
+      });
+      if (nombre) {
+        return nombre;
+      }
+    },
+    async registrarPedido() {
+
+      let cliente = await this.obtenerNombreCliente();
+      if (!cliente)
+        return;
+
+      const idUsuario = localStorage.getItem("idUsuario");
+      
       const url = apiCliente.registrarPedido;
-      const datos =  { cliente: idCliente, productos: [
-        {
-          id: this.idSeleccionado, 
-          cantidad: this.cantidadProducto
-        }
-      ],
-      total: Math.round(this.precioSeleccionado * this.cantidadProducto),
-      totalAnticipo: Math.round((this.precioSeleccionado * this.cantidadProducto)/2)
+      const datos = {
+        usuario: idUsuario,
+        cliente: cliente,
+        lugar_realizado: this.revisar() ? "Sucursal" : "Internet",
+        productos: [
+          {
+            id: this.idSeleccionado,
+            cantidad: this.cantidadProducto
+          }
+        ],
+        total: Math.ceil(this.precioSeleccionado * this.cantidadProducto),
       };
 
-      console.log(datos);
-      console.log(url);
-      // Usar toast.promise para mostrar un toast mientras la promesa está pendiente
       toast.promise(
         axios.post(url, datos, { withCredentials: true }),
         {
-          pending: 'Registrando pedido...', // Mensaje mientras la promesa está pendiente
-          success: 'Pedido registrado correctamente.', // Mensaje cuando la promesa se resuelve con éxito
-          error: 'No se pudo registrar pedido', // Mensaje cuando la promesa es rechazada
+          pending: 'Registrando pedido...',
+          success: 'Pedido registrado correctamente.',
+          error: 'No se pudo registrar pedido',
         }, toastConf
       ).then((respuesta) => {
-        // Puedes realizar acciones adicionales después de que la promesa se resuelva
-        // (opcional dependiendo de tus necesidades)
-        console.log('Pedido registrado');
-
-        // Realizar acciones adicionales según la respuesta exitosa
         if (respuesta.status === 200) {
-          console.log(respuesta.data);
-          const idPedido = respuesta.data.idPedido;
+          const idPedido = respuesta.data.id_pedido;
           localStorage.setItem('idPedido', idPedido);
-          toast.success('Registrado correctamente!');
-          setTimeout(() => {
-            this.$router.push("/registro-pedido");
-          }, 500);
-          
+          this.$router.push("/registro-pedido");
         }
       }).catch((error) => {
-        // Manejar errores de la petición
-        if (error.response) {
-          console.error('Mensaje del servidor:', error.response.data.error);
-
-          if (error.response.status === 401) {
-            toast.error('No autorizado.');
-          }
-          if (error.response.status === 404) {
-            toast.error('Ruta no encontrada.', toastConf);
-          }
-        } else if (error.request) {
-          // La solicitud fue realizada, pero no se recibió respuesta
-          console.error('No se recibió respuesta del servidor');
-          toast.error('Error de red', toastConf);
-        } else {
-          // Algo sucedió al configurar la solicitud que desencadenó un error
-          console.error('Error de configuración de la solicitud', error);
-          toast.error('Error desconocido', toastConf);
-        }
+        this.manejarError(error);
       });
-    }
+    },
+    manejarError(error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          this.$router.push("/login");
+          toast.error('No autorizado.');
+        } else if (error.response.status === 404) {
+          toast.error('Información no encontrada.');
+        } else {
+          toast.error('Error en la solicitud.');
+        }
+      } else if (error.request) {
+        toast.error('Error de red');
+      } else {
+        toast.error('Error desconocido');
+      }
+    },
   },
   mounted() {
     //this.cargar(0);
@@ -303,6 +309,7 @@ export default {
   color: #fff;
   background-color: #f85151;
 }
+
 .boton:hover {
   background-color: #fc2828;
 }

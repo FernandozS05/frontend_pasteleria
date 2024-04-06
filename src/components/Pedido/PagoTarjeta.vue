@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "@/config/axios.js";
 import { toast } from "vue3-toastify";
 import toastConf from "@/config/toast";
 import apiCliente from "@/config/ServidorCliente.js";
@@ -90,102 +90,84 @@ export default {
           }, 2000);
         }),
         {
-          pending: 'Validando pago ...', // Mensaje mientras la promesa está pendiente
-          success: 'Pago validado.', // Mensaje cuando la promesa se resuelve con éxito
-          error: 'No se pudo validar el pago.', // Mensaje cuando la promesa es rechazada
+          pending: 'Validando pago ...', 
+          success: 'Pago validado.', 
+          error: 'No se pudo validar el pago.', 
         }, toastConf
       ).then(async (respuesta) => {
-        // Puedes realizar acciones adicionales después de que la promesa se resuelva
-        // (opcional dependiendo de tus necesidades)
-        console.log('Pago completado');
-
-        // Realizar acciones adicionales según la respuesta exitosa
+    
         if (respuesta.status === 200) {
           toast.success("Pago validado.")
           this.registrarPago();
         }
       }).catch((error) => {
-        // Manejar errores de la petición
         if (error.response) {
           toast.error('Verifique los datos de su tarjeta', toastConf);
         }
       });
     },
+    revisar() {
+      const idUsuario = localStorage.getItem("idUsuario");
+      return idUsuario < 100 ? false : true;
+    },
     registrarPago() {
       let anticipado = false;
-      if(this.pedido.idPagoAnticipo != null){
+      if(this.pedido.id_anticipo != null){
         anticipado = true;
       }
-      const url = apiCliente.listarPedidos + `pagos/${this.pedido.idPedido}/registrar-pago`;
+      const url = apiCliente.registrarPago + `${this.pedido.id}`;
       const datos = {
         monto: (Math.round(parseInt(this.pedido.total) / 2)),
         direccion: "Tienda en linea.",
-        folio: Math.floor(Math.random() * (1000000 - 10000)) + 10000,
-        totalRestante: parseInt(this.pedido.total) - (Math.round(parseInt(this.pedido.total) / 2)),
-        metodoPago: "Tarjeta",
-        vendedor: "No aplica.",
-        sucursal: "Tienda en linea.",
+        folio: Math.floor(Math.random() * (1000000)) + 10000,
+        total_restante: parseInt(this.pedido.total) - (Math.round(parseInt(this.pedido.total) / 2)),
+        metodo_pago: "Tarjeta",
+        sucursal: this.revisar()? "Sucursal principal." : "Tienda en linea.",
         anticipado: anticipado
       };
-      console.log(datos);
       toast.promise(
-        axios.post(url, datos, { withCredentials: true, responseType: 'blob'} ),
+        axios.post(url, datos, {responseType: 'blob'} ),
         {
-          pending: 'Registrando pago...', // Mensaje mientras la promesa está pendiente
-          success: 'Pago registrado.', // Mensaje cuando la promesa se resuelve con éxito
-          error: 'Error al registrar pago.', // Mensaje cuando la promesa es rechazada
+          pending: 'Registrando pago...', 
+          success: 'Pago registrado.', 
+          error: 'Error al registrar pago.', 
         }, toastConf
       ).then(async (respuesta) => {
-        // Puedes realizar acciones adicionales después de que la promesa se resuelva
-        // (opcional dependiendo de tus necesidades)
-        console.log('Registro completado');
-
-        // Realizar acciones adicionales según la respuesta exitosa
         if (respuesta.status === 200) {
           const blob = new Blob([respuesta.data], { type: 'application/pdf' });
-          console.log(blob);
-          // Usa FileSaver.js para descargar el archivo
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
-
-          // Configura el enlace para descargar automáticamente el archivo
           a.href = url;
           a.download = 'Recibo_pago.pdf';
-
-          // Añade el enlace al documento y simula un clic para iniciar la descarga
           document.body.appendChild(a);
           a.click();
 
-          // Limpia y libera recursos
           window.URL.revokeObjectURL(url);
           document.body.removeChild(a);
 
-          console.log(respuesta.data) //
           toast.success("Pago registrada correctamente.")
 
           this.$router.push("pedidos");
         }
       }).catch((error) => {
-        // Manejar errores de la petición
-        if (error.response) {
-          console.error('Mensaje del servidor:', error.response.data.error);
-
-          if (error.response.status === 401) {
-            toast.error('No autorizado.');
-          }
-          if (error.response.status === 404) {
-            toast.error('Ruta no encontrada.');
-          }
-        } else if (error.request) {
-          // La solicitud fue realizada, pero no se recibió respuesta
-          console.error('No se recibió respuesta del servidor');
-          toast.error('Error de red', toastConf);
-        } else {
-          // Algo sucedió al configurar la solicitud que desencadenó un error
-          console.error('Error de configuración de la solicitud', error);
-          toast.error('Error desconocido', toastConf);
-        }
+        this.manejarError(error);
       });
+    },
+    manejarError(error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          this.$router.push("/login");
+          toast.error('No autorizado.');
+        } else if (error.response.status === 404) {
+          toast.error('Información no encontrada.');
+        } else {
+          toast.error('Error en la solicitud.');
+        }
+      } else if (error.request) {
+        toast.error('Error de red');
+      } else {
+        toast.error('Error desconocido');
+      }
     },
     redirigirATablaPedidos() {
       this.$router.push("/tablaPedidos");

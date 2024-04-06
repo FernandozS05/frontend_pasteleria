@@ -51,6 +51,9 @@
         else if(this.tipoPago=="efectivo"){
             this.$router.push("/formato")
         }
+     },
+     cancelar(){
+      this.$router.back();
      }
     }
   }

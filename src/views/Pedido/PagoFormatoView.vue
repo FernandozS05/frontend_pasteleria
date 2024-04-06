@@ -11,7 +11,7 @@
 // @ is an alias to /src
 import PagoFormato from "@/components/Pedido/PagoFormato.vue";
 import { toast } from "vue3-toastify";
-import axios from "axios";
+import axios from "@/config/axios.js";
 import toastConf from "@/config/toast";
 import apiCliente from "@/config/ServidorCliente.js";
 import BarraNavegacion from "@/components/Barras/BarraNavegacion.vue";
@@ -29,48 +29,39 @@ export default {
   },
   methods: {
     consultarInfo() {
-      const url = apiCliente.listarPedidos + `${localStorage.getItem("idPedido")}`;
+      const url = apiCliente.detallesPedido + `${localStorage.getItem("idPedido")}`;
 
       toast.promise(
-        axios.get(url, { withCredentials: true }),
+        axios.get(url),
         {
-          pending: 'Consultando pedido...', // Mensaje mientras la promesa está pendiente
-          success: 'Pedido obtenido.', // Mensaje cuando la promesa se resuelve con éxito
-          error: 'No se pudo obtener el pedido.', // Mensaje cuando la promesa es rechazada
+          pending: 'Consultando pedido...', 
+          success: 'Pedido obtenido.', 
+          error: 'No se pudo obtener el pedido.', 
         }, toastConf
       ).then((respuesta) => {
-        // Puedes realizar acciones adicionales después de que la promesa se resuelva
-        // (opcional dependiendo de tus necesidades)
-        console.log('Consulta completada');
-
-        // Realizar acciones adicionales según la respuesta exitosa
         if (respuesta.status === 200) {
-          console.log(respuesta.data)
           this.pedido = respuesta.data;
         }
       }).catch((error) => {
-        // Manejar errores de la petición
-        if (error.response) {
-          console.error('Mensaje del servidor:', error.response.data.error);
-
-          if (error.response.status === 401) {
-            toast.error('No autorizado.', toastConf);
-            this.$router.push("/pedidos");
-          }
-          if (error.response.status === 404) {
-            toast.error('Informacion no encontrada.', toastConf);
-          }
-        } else if (error.request) {
-          // La solicitud fue realizada, pero no se recibió respuesta
-          console.error('No se recibió respuesta del servidor');
-          toast.error('Error de red', toastConf);
-        } else {
-          // Algo sucedió al configurar la solicitud que desencadenó un error
-          console.error('Error de configuración de la solicitud', error);
-          toast.error('Error desconocido', toastConf);
-        }
+        this.manejarError(error);
       });
-    }
+    },
+    manejarError(error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          this.$router.push("/login");
+          toast.error('No autorizado.');
+        } else if (error.response.status === 404) {
+          toast.error('Información no encontrada.');
+        } else {
+          toast.error('Error en la solicitud.');
+        }
+      } else if (error.request) {
+        toast.error('Error de red');
+      } else {
+        toast.error('Error desconocido');
+      }
+    },
   },
   mounted(){
     this.consultarInfo()

@@ -94,21 +94,21 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "@/config/axios.js";
 import { toast } from "vue3-toastify";
 import toastConf from "@/config/toast";
-
+import apiCliente from "@/config/ServidorCliente";
 export default {
   name: "RegistroUsuario",
   data() {
     return {
       nombre: "",
-      apellido: "",
       tipo: "",
       telefono: "",
       email: "",
       contrasenia: "",
     };
+
   },
   methods: {
     validarNombre() {
@@ -139,23 +139,21 @@ export default {
       return contraseñaValida;
     },
     validarTelefono() {
-      console.log("Validando teléfono...");
-      const telefonoLimpio = this.telefono.replace(/[^0-9]/g, "");
+ 
+  const telefonoLimpio = this.telefono.replace(/[^0-9]/g, "");
 
-      if (
-        telefonoLimpio.length !== 10 ||
-        !/^\d{10}$/.test(telefonoLimpio) ||
-        /^(.)\1+$/.test(telefonoLimpio)
-      ) {
-        this.mostrarError(
-          "Número de teléfono inválido. Ingresa un número válido con exactamente 10 dígitos numéricos y que no sea una cadena repetitiva de un solo dígito."
-        );
-        return false;
-      }
+  
+  if (telefonoLimpio.length !== 10) {
+    this.mostrarError("Número de teléfono inválido. Debe contener exactamente 10 dígitos numéricos.");
+    return false;
+  }
 
-      return true;
-    },
+  return true;
+},
+
     async registrarUsuario() {
+
+      const url = apiCliente.registro;
       if (
         !this.validarNombre() ||
         !this.validarCorreo() ||
@@ -168,8 +166,6 @@ export default {
       this.apellido = this.nombre.split(':')[1];
       const datos = {
         nombre: this.nombre,
-        apellido: this.apellido,
-        tipo: this.tipo,
         telefono: this.telefono,
         email: this.email,
         contrasenia: this.contrasenia,
@@ -178,21 +174,16 @@ export default {
       toast
         .promise(
           axios.post(
-          "http://localhost:3000/api/cliente/registro",
-          datos, { withCredentials: true }),
+          url,
+          datos),
           {
-            pending: "Registrando usuario...", // Mensaje mientras la promesa está pendiente
-            success: "Registro exitoso", // Mensaje cuando la promesa se resuelve con éxito
-            error: "No se pudo registrar el usuario", // Mensaje cuando la promesa es rechazada
+            pending: "Registrando usuario...", 
+            success: "Registro exitoso", 
+            error: "No se pudo registrar el usuario", 
           },
           toastConf
         )
         .then((respuesta) => {
-          // Puedes realizar acciones adicionales después de que la promesa se resuelva
-          // (opcional dependiendo de tus necesidades)
-          console.log("Inicio de sesión completado");
-
-          // Realizar acciones adicionales según la respuesta exitosa
           if (respuesta.status === 200) {
             toast.success("Registro exitoso. ¡Inicia sesión ahora!");
             setTimeout(()=> {}, 1000)
@@ -200,7 +191,6 @@ export default {
           }
         })
         .catch((error) => {
-          // Manejar errores de la petición
           if (error.response) {
             console.error("Mensaje del servidor:", error.response.data.error);
 
@@ -211,12 +201,8 @@ export default {
               toast.error("Usuario no encontrado.", toastConf);
             }
           } else if (error.request) {
-            // La solicitud fue realizada, pero no se recibió respuesta
-            console.error("No se recibió respuesta del servidor");
             toast.error("Error de red", toastConf);
           } else {
-            // Algo sucedió al configurar la solicitud que desencadenó un error
-            console.error("Error de configuración de la solicitud", error);
             toast.error("Error desconocido", toastConf);
           }
         });

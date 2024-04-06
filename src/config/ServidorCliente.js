@@ -1,20 +1,31 @@
- const dominio = "http://localhost:3000/api/cliente";
+const ruta = "/cliente";
 
- const apiCliente = {
-    login: dominio + "/login",
-    logout: dominio + "/logout",
-    consultarProductos: dominio + "/productos/",
-    registrarPedido: dominio + "/pedidos/registrar",
-    listarPedidos: dominio + "/pedidos/",
-    registro: dominio + "/registro",
-    consultarPago: dominio + "/pagos/",
-    consultarEntrega: dominio + "/entregas/",
-    consultarAgenda: dominio + "/agenda/consultar",
-    registrarEntrega: dominio + "/entregas/registrar-entrega",
-    asignarEntrega: dominio + "/pedidos/",
-    generarPago: dominio + "/pedidos/pagos/generar-formato",
-    consultarCancelacion: dominio + "/pedidos/consultar-cancelacion/",
-    cancelarPedido: dominio + "/pedidos/cancelar-pedido/",
- }
+const apiCliente = {
+  //Clientes
+  login: ruta + "/login",
+  perfil: ruta + "/perfil",
+  registro: ruta + "/registro",
+  actualizar: ruta + "/actualizar",
+  obtenerCodigo: ruta + "/obtener-codigo",
+  validarCodigo: ruta + "/validar-codigo",
+  //Catalogo
+  consultarCatalogo: ruta + "/catalogo/consultar",
+  //Pedidos
+  registrarPedido: ruta + "/pedidos/registrar",
+  detallesPedido: ruta + "/pedidos/detalles/",
+  listarPedidos: ruta + "/pedidos/consultar",
+  asignarEntrega: ruta + "/pedidos/asignar-entrega/",
+  consultarCancelacion: ruta + "/pedidos/consultar-cancelacion/",
+  cancelarPedido: ruta + "/pedidos/cancelar-pedido/",
+  //Pagos
+  generarPago: ruta + "/pagos/generar-formato",
+  registrarPago: ruta + "/pagos/registrar-pago/",
+  consultarPago: ruta + "/pagos/consultar/",
+  //Agenda
+  consultarFechas: ruta + "/agenda/consultar-fechas",
+  //Entregas
+  registrarEntrega: ruta + "/entregas/registrar",
+  detallesEntrega: ruta + "/entregas/detalles/"
+};
 
- export default apiCliente;
+export default apiCliente;

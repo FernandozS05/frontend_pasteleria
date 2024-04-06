@@ -70,8 +70,8 @@
 
 <script>
 import apiCliente from "@/config/ServidorCliente.js";
-import apiUsuario from "@/config/ServidorEmpleado";
-import axios from "axios";
+import apiEmpleado from "@/config/ServidorEmpleado";
+import axios from "@/config/axios.js";
 import { toast } from "vue3-toastify";
 import toastConf from "@/config/toast";
 
@@ -88,50 +88,41 @@ export default {
   methods: {
     definirApi() {
       if (this.usuario.includes("@")) {
-        // Si el nombre de usuario contiene '@', selecciona la API de cliente
+        
         this.tipo = "cliente";
       } else {
-        // Si no, selecciona la API de usuario
         this.tipo = "empresa";
       }
     },
     iniciarSesion() {
       this.definirApi();
-      const api = this.tipo === "cliente" ? apiCliente : apiUsuario;
+      const api = this.tipo === "cliente" ? apiCliente : apiEmpleado;
       const url = api.login;
+      console.log(url);
       const datos =
         this.tipo === "cliente"
           ? { email: this.usuario, contrasenia: this.contrasenia }
-          : { nombreUsuario: this.usuario, contraseña: this.contrasenia };
-      console.log(url);
-      // Usar toast.promise para mostrar un toast mientras la promesa está pendiente
+          : { nombre_usuario: this.usuario, contrasenia: this.contrasenia };
       toast
         .promise(
-          axios.post(url, datos, { withCredentials: true }),
+          axios.post(url, datos),
           {
-            pending: "Iniciando sesión...", // Mensaje mientras la promesa está pendiente
-            success: "Inicio de sesión exitoso", // Mensaje cuando la promesa se resuelve con éxito
-            error: "No se pudo iniciar sesión", // Mensaje cuando la promesa es rechazada
+            pending: "Iniciando sesión...", 
+            success: "Inicio de sesión exitoso", 
+            error: "No se pudo iniciar sesión",
           },
           toastConf
         )
         .then((respuesta) => {
-          // Puedes realizar acciones adicionales después de que la promesa se resuelva
-          // (opcional dependiendo de tus necesidades)
-          console.log("Inicio de sesión completado");
-
-          // Realizar acciones adicionales según la respuesta exitosa
           if (respuesta.status === 200) {
-            console.log(respuesta.data);
+            localStorage.setItem('tokenUsuario', respuesta.data.token);
             const idUsuario = respuesta.data.id;
+            
             toast.success("Sesión iniciada correctamente!");
-            setTimeout(() => {
-              this.$emit("irAlCatalogo", idUsuario);
-            }, 2000);
+            this.$emit("irAlCatalogo", idUsuario);
           }
         })
         .catch((error) => {
-          // Manejar errores de la petición
           if (error.response) {
             console.error("Mensaje del servidor:", error.response.data.error);
 
@@ -142,12 +133,8 @@ export default {
               toast.error("Usuario no encontrado.", toastConf);
             }
           } else if (error.request) {
-            // La solicitud fue realizada, pero no se recibió respuesta
-            console.error("No se recibió respuesta del servidor");
             toast.error("Error de red", toastConf);
           } else {
-            // Algo sucedió al configurar la solicitud que desencadenó un error
-            console.error("Error de configuración de la solicitud", error);
             toast.error("Error desconocido", toastConf);
           }
         });

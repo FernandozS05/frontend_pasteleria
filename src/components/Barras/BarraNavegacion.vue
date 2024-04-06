@@ -24,6 +24,16 @@
             ><p class="fs-5 link">Catálogo</p></router-link
           >
         </li>
+        <li v-if="revisar()" class="nav-item">
+          <router-link to="/reportes" class="nav-link"
+            ><p class="fs-5 link">Inventario</p></router-link
+          >
+        </li>
+        <li v-if="revisar()" class="nav-item">
+          <router-link to="/reportes" class="nav-link"
+            ><p class="fs-5 link">Empleados</p></router-link
+          >
+        </li>
         <li class="nav-item">
           <router-link to="/pedidos" class="nav-link"
             ><p class="fs-5 link">Pedidos</p></router-link
@@ -47,12 +57,13 @@ export default {
   },
   methods: {
     cerrarSesion() {
-      this.$emit("cerrarSesion");
+      localStorage.removeItem('tokenUsuario');
+      localStorage.removeItem('idUsuario');
+      this.$router.push("/login");
     },
     revisar() {
-      const idUsuario = localStorage.getItem("idUsuario");
-
-      return idUsuario < 100 ? true : false;
+      const idUsuario = localStorage.getItem("idUsuario");      
+      return idUsuario < 100 ? false : true;
     },
   },
 };
