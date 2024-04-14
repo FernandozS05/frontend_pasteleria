@@ -1,157 +1,211 @@
 <template>
   <div id="app">
-  <div>
-    <h4>Registrar Insumo</h4>
-    <form
-      @submit.prevent="registrarInsumo"
-      class="formulario gradient-background"
-    >
-      <div class="mb-3">
-        <label for="nombre" class="form-label">Nombre:</label>
-        <input
-          type="text"
-          v-model="formulario.nombre"
-          id="nombre"
-          class="form-control"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label for="fechaCaducidad" class="form-label"
-          >Fecha de Caducidad:</label
-        >
-        <input
-          type="date"
-          v-model="formulario.fechaCaducidad"
-          id="fechaCaducidad"
-          class="form-control"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label for="cantidad" class="form-label">Cantidad/Piezas:</label>
-        <input
-          type="number"
-          v-model="formulario.cantidad"
-          id="cantidad"
-          class="form-control"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label for="gramaje" class="form-label">Gramaje (Gr):</label>
-        <input
-          type="text"
-          v-model="formulario.gramaje"
-          id="gramaje"
-          class="form-control"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label for="marca" class="form-label">Marca:</label>
-        <input
-          type="text"
-          v-model="formulario.marca"
-          id="marca"
-          class="form-control"
-          required
-        />
-      </div>
-      <div class="mb-3">
-        <label for="descripcion" class="form-label">Descripción General:</label>
-        <textarea
-          v-model="formulario.descripcion"
-          id="descripcion"
-          class="form-control"
-          rows="4"
-          required
-        ></textarea>
-      </div>
-      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button
-          type="button"
-          class="btn btn-outline-secondary me-md-2"
-          @click="cancelar"
-        >
-          Cancelar
-        </button>
-        <button type="submit" class="btn btn-rose">Registrar</button>
-      </div>
-    </form>
+    <div>
+      <p class="text-center fs-2">Registrar Insumo</p>
+      <form @submit.prevent="registrarInsumo" class="formulario gradient-background">
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombre:</label>
+          <input type="text" v-model="formulario.nombre" id="nombre" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="fechaCaducidad" class="form-label">Fecha de Caducidad:</label>
+          <input type="date" v-model="formulario.fecha_caducidad" id="fechaCaducidad" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="cantidad" class="form-label">Cantidad/Piezas:</label>
+          <input type="number" v-model="formulario.piezas" id="cantidad" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label for="descripcion" class="form-label">Descripción General:</label>
+          <textarea v-model="formulario.descripcion" id="descripcion" class="form-control" rows="4" required></textarea>
+        </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <button type="button" class="btn btn-outline-secondary me-md-2" @click="cancelar">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-rose">Registrar</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 </template>
 
 <script>
-import Swal from "sweetalert2";
-
+import apiEmpleado from "@/config/ServidorEmpleado";
+import axios from "@/config/axios.js";
+import Swal from 'sweetalert2';
 export default {
   data() {
     return {
+      editando: false,
       formulario: {
         nombre: "",
-        fechaCaducidad: "",
-        cantidad: "",
-        gramaje: "",
-        marca: "",
+        fecha_caducidad: "",
+        piezas: "",
         descripcion: "",
       },
       formularioValido: false,
     };
   },
   methods: {
-    validarFormulario() {
-      const nombreRegex = /^[A-Za-z\s]+$/;
-      const marcaRegex = /^[A-Za-z\s]+$/;
-      const descripcionRegex = /^[A-Za-z\s]+$/;
-      const gramajeRegex = /^\d+$/;
-      const fechaCaducidadValida =
-        new Date(this.formulario.fechaCaducidad) > new Date();
-      const cantidadValida = parseInt(this.formulario.cantidad) > 0;
+    consultarInsumo(idInsumo) {
+      const url = apiEmpleado.detallesInsumoInventario + idInsumo;
+      Swal.fire({
+        title: 'Cargando...',
+        text: 'Por favor, espere.',
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false
+      });
 
-      this.formularioValido =
-        nombreRegex.test(this.formulario.nombre) &&
-        marcaRegex.test(this.formulario.marca) &&
-        descripcionRegex.test(this.formulario.descripcion) &&
-        gramajeRegex.test(this.formulario.gramaje) &&
-        fechaCaducidadValida &&
-        cantidadValida &&
-        Object.values(this.formulario).every((value) => {
-          const stringValue = String(value).trim();
-          return stringValue !== "";
-        });
+      axios.get(url).then(response => {
+        if (response.status === 200) {
+          Swal.close();
+          this.formulario.nombre = response.data.nombre;
+          this.formulario.fecha_caducidad = response.data.fecha_caducidad;
+          this.formulario.piezas = response.data.piezas;
+          this.formulario.descripcion = response.data.descripcion;
+        }
+      }).catch(error => {
+        Swal.close();
+        this.manejarError(error);
+      });
     },
+    manejarError(error) {
+      if (error.response) {
 
-    registrarInsumo() {
-      this.validarFormulario();
-      if (this.formularioValido) {
-        console.log("Datos del formulario:", this.formulario);
-        this.limpiarFormulario();
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Parece que algo salio mal...",
+        });
+        if (error.response.status === 401) {
+          Swal.fire({
+            icon: "error",
+            title: "No autorizado...",
+            text: "Por favor, inicie sesión nuevamente.",
+          });
+          this.$router.push("/login")
+        }
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: ("Error de red"),
+        });
       } else {
         Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: ("Error desconocido"),
+        });
+      }
+    },
+    validarFormulario() {
+      // Validaciones de expresiones regulares para nombre y descripción
+      const nombreRegex = /^[A-Za-z\s]+$/;
+
+      // Validación de la fecha de caducidad directamente sin re-formatear
+      const fechaCaducidadValida = new Date(this.formulario.fecha_caducidad) > new Date();
+      console.log(fechaCaducidadValida)
+      const cantidadValida = parseInt(this.formulario.piezas) > 0;
+      console.log(nombreRegex.test(this.formulario.nombre))
+
+
+      // Comprobar todas las validaciones para establecer formularioValido
+      this.formularioValido =
+        nombreRegex.test(this.formulario.nombre) &&
+        fechaCaducidadValida &&
+        cantidadValida;
+      console.log(this.formularioValido)
+    },
+    async registrarInsumo() {
+      this.validarFormulario();
+
+      if (this.formularioValido) {
+        Swal.fire({
+          title: "¿Quieres guardar los cambios?",
+          showDenyButton: true,
+          showCancelButton: true,
+          confirmButtonText: "Guardar",
+          denyButtonText: "No guardar"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.enviarFormulario()
+          } else if (result.isDenied) {
+            Swal.fire("Los cambios no se han guardado", "", "info");
+          }
+        });
+
+      } else {
+        await Swal.fire({
           icon: "error",
           title: "Error...",
           text: "Por favor, complete todos los campos correctamente.",
         });
       }
     },
+    enviarFormulario() {
+
+      const idInsumo = localStorage.getItem("idInsumo");
+      const url = idInsumo
+        ? `${apiEmpleado.actualizarInsumoInventario}${idInsumo}`
+        : apiEmpleado.agregarInsumoInventario;
+
+      const method = idInsumo ? 'put' : 'post';
+
+      Swal.fire({
+        title: 'Realizando cambios...',
+        text: 'Por favor, espere.',
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false
+      });
+
+      axios[method](url, this.formulario).then(async response => {
+        if (response.status === 200) {
+          Swal.close();
+          await Swal.fire({
+            icon: "success",
+            title: idInsumo ? "Actualizacion compleatada" : "Registro completado",
+            text: `Insumo ${idInsumo ? 'actualizado' : 'registrado'} correctamente.`,
+          });
+          this.limpiarFormulario();
+          localStorage.removeItem("idInsumo");
+          this.$router.push("/listado-insumo")
+        }
+      }).catch(error => {
+        Swal.close();
+        this.manejarError(error);
+      });
+    },
     limpiarFormulario() {
       this.formulario = {
         nombre: "",
-        fechaCaducidad: "",
-        cantidad: "",
-        gramaje: "",
-        marca: "",
+        fecha_caducidad: "",
+        piezas: "",
         descripcion: "",
       };
       this.validarFormulario();
     },
     cancelar() {
-      this.$router.go(-1);
+      localStorage.removeItem("idInsumo");
       this.limpiarFormulario();
+      this.$router.back();
     },
   },
+  mounted() {
+    const idInsumo = localStorage.getItem("idInsumo");
+    if (idInsumo) {
+      this.consultarInsumo(idInsumo);
+    }
+  }
 };
 </script>
 
@@ -161,10 +215,6 @@ export default {
   margin: auto;
   padding: 20px;
   border-radius: 10px;
-}
-
-.gradient-background {
-  background: linear-gradient(to top, #ffffff, #ffc6d1);
 }
 
 .text-rose {
@@ -184,6 +234,6 @@ export default {
 
 #app {
   max-width: 100%;
-  overflow-x:hidden;
+  overflow-x: hidden;
 }
 </style>

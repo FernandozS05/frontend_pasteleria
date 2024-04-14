@@ -7,19 +7,13 @@
           <p class="fs-5 fw-medium align-self-end">Nombre</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Fecha de Caducidad</p>
+          <p class="fs-5 fw-medium align-self-end">Fecha de caducidad</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Cantidad/Piezas</p>
+          <p class="fs-5 fw-medium align-self-end">Piezas</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Gramaje</p>
-        </th>
-        <th>
-          <p class="fs-5 fw-medium align-self-end">Marca</p>
-        </th>
-        <th>
-          <p class="fs-5 fw-medium align-self-end">Descripción General</p>
+          <p class="fs-5 fw-medium align-self-end">Descripción general</p>
         </th>
         <th>
           <p class="fs-5 fw-medium align-self-end">Editar</p>
@@ -30,37 +24,26 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(elemento, index) in insumos" :key="index">
+      <tr v-for="(insumo, index) in insumos" :key="index">
         <td>
-          <img
-            class="img-fluid mx-2 align-self-start"
-            src="../../assets/cake-solid-24.png"
-            alt=""
-          />
-          <p class="fs-5 align-self-start" :title="elemento.insumo.nombre">
-            {{ elemento.insumo.nombre }}
+          <p class="fs-5 align-self-start" :title="insumo.nombre">
+            {{ insumo.nombre }}
           </p>
         </td>
         <td>
-          <p class="fs-5">{{ elemento.insumo.fechaCaducidad }}</p>
+          <p class="fs-5">{{ insumo.fecha_caducidad }}</p>
         </td>
         <td>
-          <p class="fs-5">{{ elemento.insumo.cantidad }}</p>
+          <p class="fs-5">{{ insumo.piezas }}</p>
         </td>
         <td>
-          <p class="fs-5">{{ elemento.insumo.gramaje }}</p>
-        </td>
-        <td>
-          <p class="fs-5">{{ elemento.insumo.marca }}</p>
-        </td>
-        <td>
-          <p class="fs-5">{{ elemento.insumo.descripcion }}</p>
+          <p class="fs-5">{{ insumo.descripcion }}</p>
         </td>
         <td>
           <button
             type="button"
             class="btn btn-primary btn-sm"
-            @click="editarInsumo(index)"
+            @click="editarInsumo(insumo.id)"
           >
             Editar
           </button>
@@ -69,7 +52,7 @@
           <button
             type="button"
             class="btn btn-danger btn-sm"
-            @click="eliminarInsumo(index)"
+            @click="eliminarInsumo(insumo.id)"
           >
             Eliminar
           </button>
@@ -81,6 +64,7 @@
 </template>
 
 <script>
+import Swal from 'sweetalert2';
 export default {
   name: "TablaInsumo",
   props: {
@@ -90,11 +74,21 @@ export default {
     },
   },
   methods: {
-    editarInsumo() {
-      this.$router.push("/modificar-insumo");
+    editarInsumo(idInsumo) {
+      this.$emit("editarInsumo", idInsumo);
     },
-    eliminarInsumo() {
-
+    eliminarInsumo(idInsumo) {
+      Swal.fire({
+          title: "¿Quieres eliminar este insumo?",
+          showDenyButton: true,
+          showCancelButton: false,
+          confirmButtonText: "Eliminar",
+          denyButtonText: "Cancelar"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$emit("eliminarInsumo", idInsumo);
+          }
+        });
     },
   },
 };

@@ -48,53 +48,53 @@ export default {
       this.$router.back();
     },
     enviarCodigo() {
-  if (this.opcion === "") {
-    Swal.fire({
-      icon: "info",
-      title: "Seleccione una opción",
-      text: "Por favor seleccione un método para restablecer su contraseña.",
-    });
-    return;
-  }
-
-  const url = apiCliente.obtenerCodigo;
-  const datos = {
-    correo: localStorage.getItem("correoUsuario"),
-    metodo: this.opcion,
-  };
-
-  Swal.fire({
-    title: 'Enviando código...',
-    text: 'Por favor, espere.',
-    didOpen: () => {
-      Swal.showLoading(); 
-    },
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    allowEnterKey: false
-  });
-  axios.post(url, datos)
-    .then(response => {
-      Swal.close();
-      if(response.status == 200){
-      Swal.fire({
-        icon: 'success',
-        title: 'Código enviado',
-        text: 'El código de verificación ha sido enviado exitosamente.',
-      }).then(() => {
-        this.$router.push("/codigo-seguridad");
-      });
+      if (this.opcion === "") {
+        Swal.fire({
+          icon: "info",
+          title: "Seleccione una opción",
+          text: "Por favor seleccione un método para restablecer su contraseña.",
+        });
+        return;
       }
-    })
-    .catch(() => {
-      Swal.close();
+
+      const url = apiCliente.obtenerCodigo;
+      const datos = {
+        correo: localStorage.getItem("correoUsuario"),
+        metodo: this.opcion,
+      };
+
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Hubo un problema al enviar el código. Por favor, inténtelo de nuevo.',
+        title: 'Enviando código...',
+        text: 'Por favor, espere.',
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false
       });
-    });
-},
+      axios.post(url, datos)
+        .then(response => {
+          Swal.close();
+          if (response.status == 200) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Código enviado',
+              text: 'El código de verificación ha sido enviado exitosamente.',
+            }).then(() => {
+              this.$router.push("/codigo-seguridad");
+            });
+          }
+        })
+        .catch(() => {
+          Swal.close();
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al enviar el código. Por favor, inténtelo de nuevo.',
+          });
+        });
+    },
 
     cerrarModal() {
       this.$emit("cerrar");

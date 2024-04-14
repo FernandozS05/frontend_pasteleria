@@ -1,4 +1,5 @@
 <template>
+   <BarraNavegacion />
   <div class="listado-insumos-view">
     <ListadoInsumo />
   </div>
@@ -8,11 +9,12 @@
 // @ is an alias to /src
 import ListadoInsumo from "../../components/Inventario/ListadoInsumo.vue";
 import { toast } from "vue3-toastify";
-
+import BarraNavegacion from "../../components/Barras/BarraNavegacion.vue";
 export default {
   name: "ListadoInsumoView",
   components: {
     ListadoInsumo,
+    BarraNavegacion
   },
   methods: {
     notify() {

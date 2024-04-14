@@ -3,7 +3,7 @@ const ruta = "/empleado";
 const apiEmpleado = {
   //Clientes
   login: ruta + "/login",
-  perfil: ruta + "/perfil",
+  perfil: ruta + "/perfil/",
   registro: ruta + "/registro",
   listar: ruta + "/consultar",
   actualizar: ruta + "/actualizar/",
@@ -14,17 +14,18 @@ const apiEmpleado = {
   consultarCatalogoCatalogo: ruta + "/catalogo/consultar",
   detallesProductoCatalogo: ruta + "/catalogo/detalles/",
   actualizarProductoCatalogo: ruta + "/catalogo/actualizar/",
-   eliminarProductoCatalogo: ruta + "/catalogo/eliminar/",
-   //Inventario-Insumos
-   consultarInsumosInventario: ruta + "/inventario/consultar-insumos",
-   agregarInsumoInventario: ruta + "/inventario/agregar-insumo",
-   detallesInsumoInventario: ruta + "/inventario/insumos/",
-   actualizarInsumoInventario: ruta + "/inventario/actualizar-insumo/",
-   eliminarInsumoInventario: ruta + "/inventario/eliminar-insumo/",
-   //Inventario-Productos
-   consultarProductosInventario: ruta + "/inventario/consultar-productos",
-   agregarProductoInventario: ruta + "/inventario/agregar-producto",
-   eliminarProductoInventario: ruta + "/inventario/eliminar-producto/",
+  eliminarProductoCatalogo: ruta + "/catalogo/eliminar/",
+  //Inventario-Insumos
+  consultarInsumosInventario: ruta + "/inventario/consultar-insumos",
+  agregarInsumoInventario: ruta + "/inventario/agregar-insumo",
+  detallesInsumoInventario: ruta + "/inventario/insumos/",
+  actualizarInsumoInventario: ruta + "/inventario/actualizar-insumo/",
+  eliminarInsumoInventario: ruta + "/inventario/eliminar-insumo/",
+  //Inventario-Productos
+  consultarProductosInventario: ruta + "/inventario/consultar-productos",
+  registrarProductoInventario: ruta + "/inventario/agregar-producto",
+  eliminarProductoInventario: ruta + "/inventario/eliminar-producto/",
+  venderProductoInventario: ruta + "/inventario/vender-producto",
   //Pedidos
   registrarPedido: ruta + "/pedidos/registrar",
   listarPedidos: ruta + "/pedidos/",

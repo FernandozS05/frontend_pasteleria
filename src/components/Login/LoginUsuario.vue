@@ -30,7 +30,7 @@
             </div>
 
             <div class="form-check">
-              <a  @click="irARestablecer" class="text-purple">¿Has olvidado la
+              <a @click="irARestablecer" class="text-purple">¿Has olvidado la
                 contraseña?</a>
             </div>
 
@@ -90,8 +90,6 @@ export default {
           {
             pending: "Iniciando sesión...",
             success: "Inicio de sesión exitoso",
-            pending: "Iniciando sesión...",
-            success: "Inicio de sesión exitoso",
             error: "No se pudo iniciar sesión",
           },
           toastConf
@@ -100,7 +98,7 @@ export default {
           if (respuesta.status === 200) {
             localStorage.setItem("tokenUsuario", respuesta.data.token);
             const idUsuario = respuesta.data.id;
-
+            localStorage.setItem("tipoUsuario", this.tipo === "cliente" ? "cliente" : "empresa");
             toast.success("Sesión iniciada correctamente!");
             Swal.fire({
               position: "center",
@@ -153,20 +151,64 @@ export default {
           }
         });
     },
-    async irARestablecer() {
-      if (this.usuario == "") {
-        const { value: email } = await Swal.fire({
-          title: "Ingrese su correo",
-          input: "email",
-          inputLabel: "Ingrese el correo electronico con el que se registro.",
-          inputPlaceholder: "Ingrese su correo"
+    solicitarRestablecer(nombreUsuario) {
+
+      const url = apiEmpleado.restablecer;
+      const datos = {
+        nombre_usuario: nombreUsuario,
+      };
+
+      Swal.fire({
+        title: 'Realizando solicitud...',
+        text: 'Por favor, espere.',
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false
+      });
+      axios.put(url, datos)
+        .then(response => {
+          Swal.close();
+          if (response.status == 200) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Solicitud enviada',
+              text: 'El administrador se pondra en contacto con usted lo mas pronto posible.',
+            })
+          }
+        })
+        .catch(() => {
+          Swal.close();
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un problema al enviar el código. Por favor, inténtelo de nuevo.',
+          });
         });
-        if (email) {
-          localStorage.setItem("correoUsuario", email);
+    },
+    async irARestablecer() {
+      const { value: usuario } = await Swal.fire({
+        title: "Ingrese su nombre de usuario o correo electrónico",
+        input: "text",
+        text: "Ingrese su nombre de usuario o correo electrónico con el que se registró.",
+        inputPlaceholder: "Nombre de usuario o correo"
+      });
+
+      if (usuario) {
+        const esCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(usuario);
+
+        if (esCorreo) {
+          localStorage.setItem("correoUsuario", usuario);
           this.$router.push("/restablecer-contrasena");
+        } else {
+          localStorage.setItem("nombreUsuario", usuario);
+          this.solicitarRestablecer(usuario);
         }
       }
     }
+
   },
 };
 </script>

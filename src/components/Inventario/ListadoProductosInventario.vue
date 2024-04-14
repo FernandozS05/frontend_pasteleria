@@ -1,21 +1,31 @@
 <template>
-  <div>
-    <div class="row">
-      <div class="col container pt-2 bg-light shadow m-3 rounded border border-dark">
-        <div class="row d-flex justify-space-between">
-          <p class="col-4 fs-4 align-items-start fw-medium subtitulo">
-            Empleados Registrados
-          </p>
-          <BarraBusqueda class="col-6 align-items-center" :placeholder="Buscar" @filtrar="filtrarEmpleadosTexto" />
-          <button type="button"
-            class="col-1 btn btn-success boton-agregar d-flex align-items-center justify-content-evenly text-center p-1 boton-hover"
-            @click="nuevoEmpleado">
-            Agregar
-          </button>
-        </div>
-        <div class="row p-3">
-          <TablaEmpleados class="col-12 border border-3 rounded" :empleados="empleadosFiltrados"
-            @editarEmpleado="editarEmpleado" @eliminarEmpleado="eliminarEmpleado" />
+  <div id="app">
+    <div>
+      <div class="row justify-content-between align-items-center fondo-encabezado">
+      </div>
+      <div class="row">
+        <div class="col container pt-2 bg-light shadow m-3 rounded border border-dark">
+          <div class="row">
+            <p class="col-10 fs-4 d-flex align-items-start text-nowrap fw-medium subtitulo">
+              Productos en el inventario
+              <BarraBusqueda class="col-6 ms-5 align-items-center" :placeholder="Buscar"
+                @filtrar="filtrarProductosTexto" />
+              <button type="button"
+                class="btn btn-success boton-agregar ms-5"
+                @click="nuevoProducto">
+                Agregar
+              </button>
+              <button type="button"
+                class="btn btn-success boton-agregar ms-5 d-flex align-items-center justify-content-evenly text-center p-1 boton-hover text-nowrap"
+                @click="verInsumos">
+                Ver insumos
+              </button>
+            </p>
+          </div>
+          <div class="row p-3">
+            <TablaProductosInventario class="col-12 border border-3 rounded" :productos="productosFiltrados" @editarProducto="editarProducto"
+              @eliminarProducto="eliminarProducto" />
+          </div>
         </div>
       </div>
     </div>
@@ -24,41 +34,46 @@
 
 <script>
 import BarraBusqueda from "../Barras/BarraBusqueda.vue";
-import TablaEmpleados from "../Registro/TablaEmpleados.vue";
+import TablaProductosInventario from "../Producto/TablaProductosInventario.vue";
 import apiEmpleado from "@/config/ServidorEmpleado";
 import axios from "@/config/axios.js";
 import Swal from 'sweetalert2';
 export default {
-  name: "ListadoEmpleados",
+  name: "ListadoInsumo",
   components: {
     BarraBusqueda,
-    TablaEmpleados
+    TablaProductosInventario,
   },
   data() {
     return {
-      empleados: [],
-      empleadosFiltrados: []
+      productos: [],
+      productosFiltrados: []
     };
   },
   methods: {
-    nuevoEmpleado() {
-      this.$router.push("/formulario-empleado");
+    verInsumos(){
+      this.$router.push("/listado-insumo");
     },
-    editarEmpleado(idEmpleado) {
-      localStorage.setItem("idEmpleado",idEmpleado);
-      this.$router.push("/formulario-empleado");
-    },
-    filtrarEmpleadosTexto(textoDeBusqueda) {
+    filtrarProductosTexto(textoDeBusqueda) {
       if (textoDeBusqueda) {
-        this.empleadosFiltrados = this.empleados.filter(empleado =>
-        empleado.nombre.toLowerCase().includes(textoDeBusqueda.toLowerCase())
+        this.productosFiltrados = this.productos.filter(insumo =>
+          insumo.nombre.toLowerCase().includes(textoDeBusqueda.toLowerCase())
         );
       } else {
-        this.empleadosFiltrados = this.empleados;
+        this.productosFiltrados = this.productos;
       }
     },
-    eliminarEmpleado(idEmpleado) {
-      const url = apiEmpleado.eliminar + idEmpleado;
+    nuevoProducto() {
+      localStorage.setItem("ubicacionProducto", "inventario");
+      this.$router.push("/formulario-producto");
+    },
+    editarProducto(idInsumo) {
+      localStorage.setItem("idProducto", idInsumo);
+      localStorage.setItem("ubicacionProducto", "inventario");
+      this.$router.push("/formulario-producto");
+    },
+    eliminarProducto(idProducto) {
+      const url = apiEmpleado.eliminarProductoInventario + idProducto;
       Swal.fire({
         title: 'Realizando cambios...',
         text: 'Por favor, espere.',
@@ -76,7 +91,7 @@ export default {
           await Swal.fire({
             icon: 'success',
             title: '¡Eliminado!',
-            text: 'El usuario se ha eliminado correctamente.',
+            text: 'El elemento se ha eliminado correctamente.',
           });
           window.location.reload();
         }
@@ -85,8 +100,8 @@ export default {
         this.manejarError(error);
       });
     },
-    async consultarEmpleados() {
-      const url = apiEmpleado.listar;
+    async consultarProductos() {
+      const url = apiEmpleado.consultarProductosInventario;
       Swal.fire({
         title: 'Cargando...',
         text: 'Por favor, espere.',
@@ -102,23 +117,16 @@ export default {
         if (response.status === 200) {
           Swal.close();
           console.log(response.data)
-          this.empleados = response.data;
-          this.empleadosFiltrados = this.empleados;
-          if(!this.empleados.length > 0) {
-            Swal.fire({
-            icon: "error",
-            title: "No se encontraron usuarios...",
-            text: "Parece que no hay ningun usuario registrado.",
-          });
-          }
+          this.productos = response.data;
+          this.productosFiltrados = this.productos;
         }
       }).catch(error => {
         Swal.close();
         if (error.response.status === 404) {
           Swal.fire({
             icon: "error",
-            title: "No se encontraron usuarios...",
-            text: "Parece que no hay ningun usuario registrado.",
+            title: "No se encontraron elementos...",
+            text: "Parece que no hay ningun producto en el inventario.",
           });
         }
         else if (error.request) {
@@ -138,6 +146,7 @@ export default {
     },
     manejarError(error) {
       if (error.response) {
+
         Swal.fire({
           icon: "error",
           title: "Error...",
@@ -165,19 +174,16 @@ export default {
         });
       }
     }
+
   },
-  async mounted(){
-    localStorage.removeItem("idEmpleado");
-    await this.consultarEmpleados();
+  async mounted() {
+    localStorage.removeItem("idProducto");
+    await this.consultarProductos();
   }
 };
 </script>
 
 <style scoped>
-.fondo-encabezado {
-  background: linear-gradient(to top, #ffffff, #ffc6d1);
-}
-
 .boton-agregar {
   background-color: #fe8092;
   color: #ffffff;
@@ -203,5 +209,10 @@ export default {
 
 .logo-pasteleria {
   width: 120px;
+}
+
+#app {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 </style>

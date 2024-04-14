@@ -1,9 +1,9 @@
 <template>
-  <div id="app">
+ 
   <div class="container d-flex">
-    <div class="col-auto mostrador d-flex p-3" id="mostrador">
-      <div class="row">
-        <ProductoCatalogo
+    <div class="col-auto mostrador flex-grow-1 d-flex p-3"  id="mostrador">
+      
+        <ProductoCatalogo 
           v-for="(producto, index) in productos"
           :key="index"
           :imagen="producto.imagen"
@@ -12,11 +12,11 @@
           :precio="producto.precio"
           @detalle="cargar(index)"
         />
-      </div>
+      
     </div>
     <!-- CONTENEDOR DEL ITEM SELECCIONADO -->
     <div
-      class="col-auto seleccion border border-4 rounded mt-3 me-3"
+      class="seleccion border border-4 rounded mt-3 me-3"
       id="seleccion"
     >
       <div class="cerrar" @click="cerrar">Cerrar</div>
@@ -58,7 +58,6 @@
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -102,6 +101,9 @@ export default {
       this.precioSeleccionado = producto.precio;
       this.imagenSeleccionada = producto.imagen;
 
+    mostrador.classList.add("active");
+    seleccion.classList.add("active");
+
       mostrador.style.width = "60%";
       seleccion.style.width = "40%";
       seleccion.style.opacity = "1";
@@ -109,6 +111,8 @@ export default {
     cerrar() {
       let mostrador = document.getElementById("mostrador");
       let seleccion = document.getElementById("seleccion");
+      mostrador.classList.remove("active");
+      seleccion.classList.remove("active");
       mostrador.style.width = "100%";
       seleccion.style.width = "0%";
       seleccion.style.opacity = "0";
@@ -228,23 +232,28 @@ export default {
   font-family: "Open Sans";
 }
 
-.contenido {
-  max-width: 1200px;
-  width: 100%;
-  margin: 40px auto;
-  display: flex;
-}
-
 .mostrador {
-  width: 100%;
-  transition: 0.5s ease;
+  display: flex;
+  flex-wrap: wrap; /* Permite que los items se ajusten a la siguiente línea */
+  gap: 10px; /* Espacio entre los productos */
+  transition: all 0.3s ease; /* Suave transición para los cambios de tamaño */
 }
 
-.mostrador .fila {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 40px;
+.seleccion {
+  transition: all 0.5s ease;
+  width: 0%; /* Inicia sin tomar espacio */
+  overflow: hidden;
+  flex-shrink: 0; /* Evita que se reduzca */
+}
+
+/* Cuando la selección está activa, ajusta los anchos */
+.mostrador.active {
+  flex-basis: 60%;
+}
+
+.seleccion.active {
+  width: 40%;
+  opacity: 1;
 }
 
 .mostrador .fila .item {
@@ -362,4 +371,6 @@ export default {
   max-width: 100%;
   overflow-x: hidden;
 }
+
+
 </style>

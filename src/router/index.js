@@ -20,12 +20,13 @@ import ListadoInsumoView from '@/views/Inventario/ListadoInsumoView.vue'
 import ListadoEntregasView from '@/views/Entregas/ListadoEntregasView.vue'
 import CambiarContrasenaView from '@/views/RestablecerContrasena/CambiarContrasenaView.vue'
 import CambiarContrasenaEmpleadoView from '@/views/RestablecerContrasena/CambiarContrasenaEmpleadoView.vue'
-import RegistroEmpleadoView from '@/views/Registro/RegistroEmpleadoView.vue'
 import ListadoEmpleadosView from '@/views/Registro/ListadoEmpleadosView.vue'
-import ModificarDatosEmpleadoView from '@/views/Registro/ModificarDatosEmpleadoView.vue'
+import FormularioEmpleadoView from '@/views/Registro/FormularioEmpleadoView.vue'
 import ModificarInsumoView from '@/views/Inventario/ModificarInsumoView.vue'
 import ModificarEntregaView from '@/views/Entregas/ModificarEntregaView.vue'
-
+import ListadoProductosInventarioView from '@/views/Inventario/ListadoProductosInventarioView.vue'
+import FormularioProductoView from '@/views/Producto/FormularioProductoView.vue'
+import ListadoProductosCatalogoView from '@/views/Catalogo/ListadoProductosCatalogoView.vue'
 const routes = [
   {
     path: '/',
@@ -159,14 +160,24 @@ const routes = [
     component: ListadoEmpleadosView
   },
   {
-    path: '/registro-empleado',
-    name: 'RegistroEmpleado',
-    component: RegistroEmpleadoView
+    path: '/formulario-empleado',
+    name: 'FormularioEmpleado',
+    component: FormularioEmpleadoView
   },
   {
-    path: '/modificar-datos',
-    name: 'ModificarDatos',
-    component: ModificarDatosEmpleadoView
+    path: '/productos-inventario',
+    name: 'ProductosInventario',
+    component: ListadoProductosInventarioView
+  },
+  {
+    path: '/productos-catalogo',
+    name: 'ProductosCatalogo',
+    component: ListadoProductosCatalogoView
+  },
+  {
+    path: '/formulario-producto',
+    name: 'FormularioProducto',
+    component: FormularioProductoView
   },
   {
     path: '/about',

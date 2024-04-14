@@ -1,18 +1,26 @@
 <template>
-  <div class="row">
-    <BarraNavegacion @cerrarSesion="cerrarSesion" />
-    <div class="row mt-3 border rounded border-4">
-      <div class="row">
-        <p class="col-6 fs-4 align-items-start  fw-medium subtitulo">Productos disponibles</p>
-        <BarraBusqueda class="col-6 align-items-center" :placeholder="Buscar" @filtrar="filtrarProductos" />
-      </div>
-      <div class="row">
-        <CatalogoPasteles v-if="mostrarCatalogo" :key="updateKey" v-bind:productos="productosFiltrados" />
+  <div class="container-fluid p-0 overflow-hidden">
+    <div class="row">
+      <BarraNavegacion @cerrarSesion="cerrarSesion" />
+    </div>
+    <div class="row">
+      <div class="col-12 d-flex align-items-center justify-content-between">
+        <p class="fs-4 ms-3 fw-medium subtitulo">Productos disponibles</p>
+        <button v-if="this.tipo == 'empresa'" type="button"
+                class="btn btn-success boton-agregar d-flex align-items-center justify-content-center p-1 boton-hover text-nowrap"
+                @click="editarCatalogo">
+          Editar catálogo
+        </button>
+        <BarraBusqueda :placeholder="Buscar" @filtrar="filtrarProductos" />
       </div>
     </div>
+    <div class="row">
+      <CatalogoPasteles class="col-12" v-if="mostrarCatalogo" :key="updateKey" :productos="productosFiltrados" />
+    </div>
   </div>
-
 </template>
+
+
 
 <script>
 // @ is an alias to /src
@@ -104,14 +112,19 @@ export default {
     }
   },
   methods: {
-    definirTipo() {
-      const idUsuario = localStorage.getItem('idUsuario');
-      if (idUsuario < 1000) {
-        this.tipo = "cliente";
-      } else {
-        this.tipo = "empresa";
-      }
+    editarCatalogo(){
+      this.$router.push("/productos-catalogo");
     },
+    async definirTipo() {
+    const tipo =  localStorage.getItem("tipoUsuario");
+    
+    if (!tipo) {
+      
+      this.$router.push("/login");
+      return;
+    }
+    this.tipo = tipo;
+  },
     async cargarImagenes(productos) {
       await productos.forEach(async producto => {
         producto.imagen = await this.obtenerArchivoImagen(producto);
@@ -136,7 +149,7 @@ export default {
 
         })
         .catch((error) => {
-          
+
           if (error.response) {
             console.error('Mensaje del servidor:', error.response.data.error);
 
@@ -208,8 +221,18 @@ export default {
     },
   },
   mounted() {
-    this.definirTipo();
-    this.consultarProductos()
+    this.definirTipo().then(() => {
+    this.consultarProductos();
+  });
   }
 };
 </script>
+
+<style scoped>
+.boton-agregar {
+  background-color: #fe8092;
+  color: #ffffff;
+  font-size: 1.3rem;
+  border: #ffc6d1;
+}
+</style>

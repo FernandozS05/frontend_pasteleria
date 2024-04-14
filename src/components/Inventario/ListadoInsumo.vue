@@ -1,65 +1,41 @@
 <template>
   <div id="app">
-  <div>
-    <div
-      class="row justify-content-between align-items-center fondo-encabezado"
-    >
-      <div class="col-6">
-        <p class="fs-4 lh-1 pt-2">Administrar Insumos</p>
+    <div>
+      <div class="row justify-content-between align-items-center fondo-encabezado">
       </div>
-      <div class="col-6">
-        <button
-          type="button"
-          class="btn btn-success boton-agregar d-flex align-items-center justify-content-evenly text-center p-1 boton-hover"
-          @click="nuevoInsumo"
-        >
-          <img
-            class="img-fluid px-1"
-            src="@/assets/icono_mas.png"
-            alt="Logo Agregar"
-          />
-          Agregar
-        </button>
-      </div>
-      <div class="col-2 align-self-end">
-        <img
-          class="img-fluid logo-pasteleria"
-          src="../../assets/Logo1.png"
-          alt="Logo de la Pastelería"
-        />
-      </div>
-    </div>
-    <div class="row">
-      <div
-        class="col container pt-2 bg-light shadow m-3 rounded border border-dark"
-      >
-        <div class="row">
-          <p class="col-6 fs-4 align-items-start fw-medium subtitulo">
-            Insumos Registrados
-            <BarraBusqueda
-              class="col-6 align-items-center"
-              :placeholder="Buscar"
-              @filtrar="filtrarInsumosTexto"
-            />
-          </p>
-        </div>
-        <div class="row p-3">
-          <TablaInsumo
-            class="col-12 border border-3 rounded"
-            :insumos="insumosFiltrados"
-            @editarInsumo="editarInsumo"
-            @eliminarInsumo="eliminarInsumo"
-          />
+      <div class="row">
+        <div class="col container pt-2 bg-light shadow m-3 rounded border border-dark">
+          <div class="row">
+            <p class="col-10 fs-4 d-flex align-items-start text-nowrap fw-medium subtitulo">
+              Insumos en el inventario
+              <BarraBusqueda class="col-6 ms-5 align-items-center" :placeholder="Buscar"
+                @filtrar="filtrarInsumosTexto" />
+              <button type="button" class="btn btn-success boton-agregar ms-5 " @click="nuevoInsumo">
+                Agregar
+              </button>
+              <button type="button"
+                class="btn btn-success boton-agregar ms-5 d-flex align-items-center justify-content-evenly text-center p-1 boton-hover text-nowrap"
+                @click="verProductos">
+                Ver Productos
+              </button>
+            </p>
+          </div>
+          <div class="row p-3">
+            <TablaInsumo class="col-12 border border-3 rounded" :insumos="insumosFiltrados" @editarInsumo="editarInsumo"
+              @eliminarInsumo="eliminarInsumo" />
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
 import BarraBusqueda from "../Barras/BarraBusqueda.vue";
 import TablaInsumo from "../Inventario/TablaInsumo.vue";
+import apiEmpleado from "@/config/ServidorEmpleado";
+import axios from "@/config/axios.js";
+import Swal from 'sweetalert2';
 export default {
   name: "ListadoInsumo",
   components: {
@@ -67,27 +43,143 @@ export default {
     TablaInsumo,
   },
   data() {
-    return {};
+    return {
+      insumos: [],
+      insumosFiltrados: []
+    };
   },
   methods: {
+    verProductos() {
+      this.$router.push("/productos-inventario");
+    },
+    filtrarInsumosTexto(textoDeBusqueda) {
+      if (textoDeBusqueda) {
+        this.insumosFiltrados = this.insumos.filter(insumo =>
+          insumo.nombre.toLowerCase().includes(textoDeBusqueda.toLowerCase())
+        );
+      } else {
+        this.insumosFiltrados = this.insumos;
+      }
+    },
     nuevoInsumo() {
       this.$router.push("/formulario-insumo");
     },
-    editarInsumo() {
-      this.$router.push("/modificar-insumo");
+    editarInsumo(idInsumo) {
+      localStorage.setItem("idInsumo", idInsumo);
+      this.$router.push("/formulario-insumo");
     },
-    eliminarInsumo() {
-      
+
+    eliminarInsumo(idInsumo) {
+      const url = apiEmpleado.eliminarInsumoInventario + idInsumo;
+      Swal.fire({
+        title: 'Realizando cambios...',
+        text: 'Por favor, espere.',
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false
+      });
+
+      axios.delete(url).then(async response => {
+        if (response.status === 200) {
+          Swal.close();
+          await Swal.fire({
+            icon: 'success',
+            title: '¡Eliminado!',
+            text: 'El elemento se ha eliminado correctamente.',
+          });
+          window.location.reload();
+        }
+      }).catch(error => {
+        Swal.close();
+        this.manejarError(error);
+      });
     },
+    async consultarInsumos() {
+      const url = apiEmpleado.consultarInsumosInventario;
+      Swal.fire({
+        title: 'Cargando...',
+        text: 'Por favor, espere.',
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false
+      });
+
+      axios.get(url).then(response => {
+        if (response.status === 200) {
+          Swal.close();
+          this.insumos = response.data;
+          this.insumosFiltrados = this.insumos;
+        }
+      }).catch(error => {
+        Swal.close();
+        if (error.response.status === 404) {
+          Swal.fire({
+            icon: "error",
+            title: "No se encontraron elementos...",
+            text: "Parece que no hay ningun insumo registrado.",
+          });
+        }
+        else if (error.request) {
+          Swal.fire({
+            icon: "error",
+            title: "Error...",
+            text: ("Error de red"),
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error...",
+            text: ("Error desconocido"),
+          });
+        }
+      });
+    },
+    manejarError(error) {
+      if (error.response) {
+
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Parece que algo salio mal...",
+        });
+        if (error.response.status === 401) {
+          Swal.fire({
+            icon: "error",
+            title: "No autorizado...",
+            text: "Por favor, inicie sesión nuevamente.",
+          });
+          this.$router.push("/login")
+        }
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: ("Error de red"),
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: ("Error desconocido"),
+        });
+      }
+    }
+
   },
+  async mounted() {
+    localStorage.removeItem("idInsumo");
+    await this.consultarInsumos();
+  }
 };
 </script>
 
 <style scoped>
-.fondo-encabezado {
-  background: linear-gradient(to top, #ffffff, #ffc6d1);
-}
-
 .boton-agregar {
   background-color: #fe8092;
   color: #ffffff;
@@ -117,6 +209,6 @@ export default {
 
 #app {
   max-width: 100%;
-  overflow-x:hidden;
+  overflow-x: hidden;
 }
 </style>
