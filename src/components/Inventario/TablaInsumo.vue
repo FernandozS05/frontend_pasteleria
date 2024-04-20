@@ -13,7 +13,7 @@
           <p class="fs-5 fw-medium align-self-end">Piezas</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Descripción general</p>
+          <p class="fs-5 fw-medium align-self-end">Informacion</p>
         </th>
         <th>
           <p class="fs-5 fw-medium align-self-end">Editar</p>
@@ -37,7 +37,13 @@
           <p class="fs-5">{{ insumo.piezas }}</p>
         </td>
         <td>
-          <p class="fs-5">{{ insumo.descripcion }}</p>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            @click="infoInsumo(insumo)"
+          >
+            Detalles
+          </button>
         </td>
         <td>
           <button
@@ -76,6 +82,9 @@ export default {
   methods: {
     editarInsumo(idInsumo) {
       this.$emit("editarInsumo", idInsumo);
+    },
+    infoInsumo(idInsumo) {
+      this.$emit("infoInsumo", idInsumo);
     },
     eliminarInsumo(idInsumo) {
       Swal.fire({

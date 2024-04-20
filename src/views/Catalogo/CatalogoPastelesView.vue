@@ -7,9 +7,14 @@
       <div class="col-12 d-flex align-items-center justify-content-between">
         <p class="fs-4 ms-3 fw-medium subtitulo">Productos disponibles</p>
         <button v-if="this.tipo == 'empresa'" type="button"
-                class="btn btn-success boton-agregar d-flex align-items-center justify-content-center p-1 boton-hover text-nowrap"
-                @click="editarCatalogo">
+          class="btn btn-success boton-agregar d-flex align-items-center justify-content-center p-1 boton-hover text-nowrap"
+          @click="editarCatalogo">
           Editar catálogo
+        </button>
+        <button v-if="this.tipo == 'empresa'" type="button"
+          class="btn btn-success boton-agregar d-flex align-items-center justify-content-center p-1 boton-hover text-nowrap"
+          @click="obtenerDatosPedido">
+          Pedido personalizado
         </button>
         <BarraBusqueda :placeholder="Buscar" @filtrar="filtrarProductos" />
       </div>
@@ -34,6 +39,7 @@ import apiArchivos from "@/config/ServidorArchivos";
 import axios from '@/config/axios.js';
 import { toast } from 'vue3-toastify';
 import toastConf from "@/config/toast";
+import Swal from "sweetalert2";
 export default {
   name: "CatalogoPastelesView",
   components: {
@@ -107,24 +113,162 @@ export default {
           precio: 810,
         },
       ],
-
       tipo: "",
     }
   },
   methods: {
-    editarCatalogo(){
+    async obtenerNombreCliente() {
+      const { value: nombre } = await Swal.fire({
+        title: "¿A nombre de quién se hará el pedido?",
+        input: "text",
+        inputLabel: "Nombre completo",
+        inputPlaceholder: "Ingresa el nombre de la persona",
+      });
+      if (nombre) {
+        return nombre;
+      }
+    },
+    async obtenerDatosPedido() {
+      const nombreCliente = await this.obtenerNombreCliente();
+
+      if (nombreCliente == "" || nombreCliente == null) {
+        return
+      }
+
+      const datosProducto = await this.obtenerDatosProducto();
+
+      if (datosProducto) {
+        await this.confirmarPedido(nombreCliente, datosProducto)
+      }
+    },
+    async obtenerDatosProducto() {
+      Swal.fire({
+        title: 'Producto personalizado',
+        html: `
+      <input type="text" id="nombre" class="swal2-input" placeholder="Nombre">
+      <input type="number" id="precio" class="swal2-input" placeholder="Precio" min="1">
+      <input type="text" id="descripcion" class="swal2-input" placeholder="Descripción">
+      <input type="number" id="cantidad" class="swal2-input" placeholder="Cantidad de productos" min="1">
+      <input type="number" id="horas" class="swal2-input" placeholder="Horas de trabajo" min="1">
+    `,
+        focusConfirm: false,
+        preConfirm: () => {
+          const nombre = document.getElementById('nombre').value;
+          const precio = parseFloat(document.getElementById('precio').value);
+          const descripcion = document.getElementById('descripcion').value;
+          const cantidad = parseInt(document.getElementById('cantidad').value);
+          const horas = parseFloat(document.getElementById('horas').value);
+
+          if (!nombre || parseInt(precio) <= 0 || !descripcion || parseInt(cantidad) <= 0 || parseInt(horas) <= 0) {
+            Swal.showValidationMessage('Por favor, complete todos los campos correctamente y asegúrese de que los números sean mayores que cero.');
+            console.log(nombre, precio, descripcion, cantidad, horas)
+            return false;
+          }
+          return { nombre, precio, descripcion, cantidad, horas };
+        },
+        confirmButtonText: 'Guardar',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          console.log(result.value);
+          Swal.fire(
+            'Guardado!',
+            'El producto ha sido registrado.',
+            'success'
+          );
+        }
+      });
+    },
+
+    async confirmarPedido(cliente, infoProducto) {
+      const idUsuario = localStorage.getItem("idUsuario");
+      const datos = {
+        usuario: idUsuario,
+        cliente: cliente,
+        lugar_realizado: "Sucursal",
+        productos: [{
+          nombre: infoProducto.nombre,
+          precio: infoProducto.precio,
+          horas_trabajo: infoProducto.horas,
+          descripcion: infoProducto.descripcion,
+          cantidad: infoProducto.cantidad,
+        }],
+        total: Math.ceil(parseInt(infoProducto.precio) * parseInt(infoProducto.cantidad)),
+      };
+
+      const htmlContent = `
+    <div>
+      <p><strong>Cliente:</strong> ${cliente}</p>
+      <p><strong>Producto:</strong> ${infoProducto.nombre}</p>
+      <p><strong>Precio:</strong> $${infoProducto.precio}</p>
+      <p><strong>Cantidad:</strong> ${infoProducto.cantidad}</p>
+      <p><strong>Descripción:</strong> ${infoProducto.descripcion}</p>
+      <p><strong>Total:</strong> $${datos.total}</p>
+    </div>
+  `;
+
+      try {
+        const { isConfirmed } = await Swal.fire({
+          title: 'Confirmar Pedido',
+          html: htmlContent,
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Confirmar Pedido',
+          cancelButtonText: 'Cancelar'
+        });
+
+        if (isConfirmed) {
+          this.realizarRegistroPedido(datos);
+        }
+      } catch (error) {
+        console.error("Error al intentar confirmar el pedido: ", error);
+        Swal.fire(
+          'Error',
+          'Hubo un problema al confirmar el pedido: ' + error.message,
+          'error'
+        );
+      }
+    },
+    async realizarRegistroPedido(datos) {
+      const url = apiEmpleado.registrarPedido;
+      toast
+        .promise(
+          axios.post(url, datos, { withCredentials: true }),
+          {
+            pending: "Registrando pedido...",
+            success: "Pedido registrado correctamente.",
+            error: "No se pudo registrar pedido"
+          },
+          toastConf
+        )
+        .then((respuesta) => {
+          if (respuesta.status === 200) {
+            const idPedido = respuesta.data.id_pedido;
+            localStorage.setItem("idPedido", idPedido);
+            this.$router.push("/registro-pedido");
+          }
+        })
+        .catch((error) => {
+          this.manejarError(error);
+        });
+    }
+    ,
+
+    editarCatalogo() {
       this.$router.push("/productos-catalogo");
     },
     async definirTipo() {
-    const tipo =  localStorage.getItem("tipoUsuario");
-    
-    if (!tipo) {
-      
-      this.$router.push("/login");
-      return;
-    }
-    this.tipo = tipo;
-  },
+      const tipo = localStorage.getItem("tipoUsuario");
+
+      if (!tipo) {
+
+        this.$router.push("/login");
+        return;
+      }
+      this.tipo = tipo;
+    },
     async cargarImagenes(productos) {
       await productos.forEach(async producto => {
         producto.imagen = await this.obtenerArchivoImagen(producto);
@@ -222,8 +366,8 @@ export default {
   },
   mounted() {
     this.definirTipo().then(() => {
-    this.consultarProductos();
-  });
+      this.consultarProductos();
+    });
   }
 };
 </script>

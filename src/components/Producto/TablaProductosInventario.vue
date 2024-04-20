@@ -53,6 +53,7 @@
 
 <script>
 import apiArchivos from "@/config/ServidorArchivos";
+import apiCliente from "@/config/ServidorCliente";
 import apiEmpleado from "@/config/ServidorEmpleado";
 import axios from '@/config/axios.js';
 import Swal from "sweetalert2";
@@ -78,7 +79,7 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           this.$emit("eliminarProducto", idProducto);
-        } 
+        }
       });
 
     },
@@ -183,6 +184,9 @@ export default {
               showConfirmButton: false,
               timer: 1500,
             });
+
+            await this.preguntarFactura(producto);
+
             window.location.reload();
           }
         })
@@ -190,6 +194,106 @@ export default {
           Swal.close();
           this.manejarError(error);
         });
+    },
+    async obtenerDatosCliente() {
+      const result = await Swal.fire({
+        title: 'Datos del cliente',
+        html: `
+      <input type="text" id="nombre" class="swal2-input" placeholder="Nombre completo">
+      <input type="text" id="rfc" class="swal2-input" placeholder="RFC">
+      <input type="email" id="correo" class="swal2-input" placeholder="Correo electrónico">
+    `,
+        focusConfirm: false,
+        preConfirm: () => {
+          const nombre = document.getElementById('nombre').value;
+          const rfc = document.getElementById('rfc').value;
+          const correo = document.getElementById('correo').value;
+
+          if (!nombre || !rfc || rfc.length !== 13 || !correo) {
+            Swal.showValidationMessage('Por favor, complete todos los campos correctamente.');
+            return false;
+          }
+          return { nombre : nombre, rfc : rfc, correo: correo };
+        },
+        confirmButtonText: 'Generar Factura',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+      });
+      return result.isConfirmed ? result.value : null;
+    },
+
+    async preguntarFactura(producto) {
+      const resultado = await Swal.fire({
+        title: "¿Desea generar una factura para esta venta?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, generar factura"
+      });
+
+      if (resultado.isConfirmed) {
+        const datosCliente = await this.obtenerDatosCliente();
+
+        if (datosCliente) {
+          const datosFactura = {
+            cliente: datosCliente,
+            productos: [{ nombre: producto.nombre, cantidad: 1, precio: producto.precio }],
+          };
+          console.log(datosFactura);
+          await this.generarFactura(datosFactura);
+        }
+      }
+    }
+    ,
+    async generarFactura(datos) {
+
+      try {
+        const url = apiCliente.generarFactura;
+        console.log(url);
+        Swal.fire({
+          title: 'Registrando venta...',
+          text: 'Por favor, espere.',
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          allowEnterKey: false
+        });
+        const respuesta = await axios.post(url, datos, { responseType: "blob" });
+
+        if (respuesta.status === 200) {
+          Swal.close();
+          const blob = new Blob([respuesta.data], {
+            type: "application/pdf",
+          });
+
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+
+          a.href = url;
+          a.download = "Factura_compra.pdf";
+
+          document.body.appendChild(a);
+          a.click();
+
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+
+          await Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Factura enviada exitosamente.",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      } catch (error) {
+        Swal.close();
+        console.log(error);
+        this.manejarError(error);
+      }
     },
     async verProducto(producto) {
       const urlImagen = await this.obtenerImagen(producto.imagen);

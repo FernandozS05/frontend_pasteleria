@@ -124,7 +124,7 @@ export default {
         Swal.close();
         if (error.response.status === 404) {
           Swal.fire({
-            icon: "error",
+            icon: "info",
             title: "No se encontraron elementos...",
             text: "Parece que no hay ningun producto en el inventario.",
           });

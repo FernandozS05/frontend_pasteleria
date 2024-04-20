@@ -22,6 +22,7 @@ const apiCliente = {
   generarPago: ruta + "/pagos/generar-formato",
   registrarPago: ruta + "/pagos/registrar-pago/",
   consultarPago: ruta + "/pagos/consultar/",
+  generarFactura: ruta + "/pagos/generar-factura",
   //Agenda
   consultarFechas: ruta + "/agenda/consultar-fechas",
   //Entregas

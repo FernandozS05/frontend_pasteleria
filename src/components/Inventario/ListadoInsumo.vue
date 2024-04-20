@@ -22,7 +22,7 @@
           </div>
           <div class="row p-3">
             <TablaInsumo class="col-12 border border-3 rounded" :insumos="insumosFiltrados" @editarInsumo="editarInsumo"
-              @eliminarInsumo="eliminarInsumo" />
+              @infoInsumo="verInfoInsumo" @eliminarInsumo="eliminarInsumo" />
           </div>
         </div>
       </div>
@@ -61,6 +61,77 @@ export default {
         this.insumosFiltrados = this.insumos;
       }
     },
+
+    async verInfoInsumo(insumo) {
+      try {
+        const result = await Swal.fire({
+          title: `${insumo.nombre}`,
+          html: `<p class="description">${insumo.descripcion}</p>`,
+          input: 'number',
+          inputLabel: 'Cantidad de Piezas Disponibles',
+          inputValue: insumo.piezas,
+          inputAttributes: {
+            min: 0,
+            step: 1
+          },
+          showCancelButton: true,
+          confirmButtonText: "Guardar",
+          cancelButtonText: "Cancelar",
+          confirmButtonColor: '#fe8092'
+        });
+
+        // Verificar si el usuario confirmó y si se ingresó un valor.
+        if (result.isConfirmed && result.value !== null) {
+          const nuevasPiezas = result.value;  // Directamente usar el valor aquí.
+          await this.actualizarPiezasInsumo(insumo.id, nuevasPiezas);
+        }
+      } catch (error) {
+        console.error("Error al intentar actualizar las piezas: ", error);
+        Swal.fire(
+          'Error',
+          'Hubo un problema al actualizar las piezas: ' + error.message,
+          'error'
+        );
+      }
+    }
+    ,
+
+    // Este método actualiza las piezas de un insumo en el servidor.
+    async actualizarPiezasInsumo(idInsumo, nuevasPiezas) {
+      const url = `${apiEmpleado.actualizarInsumoInventario}${idInsumo}`;
+      try {
+
+        Swal.fire({
+          title: 'Realizando cambios...',
+          text: 'Por favor, espere.',
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          allowEnterKey: false
+        });
+        const response = await axios.put(url, { piezas: nuevasPiezas });
+        if (response.status === 200) {
+          Swal.close();
+          await Swal.fire({
+            icon: "success",
+            title: "Actualización completada",
+            text: `Las piezas del insumo han sido actualizadas correctamente.`,
+          });
+          this.consultarInsumos();
+        }
+      } catch (error) {
+        console.log(error);
+        Swal.close();
+        Swal.fire({
+          icon: "error",
+          title: "Error al actualizar",
+          text: `Hubo un error al actualizar las piezas del insumo: ${error.response ? error.response.data.message : error.message}`
+        });
+      }
+    },
+
     nuevoInsumo() {
       this.$router.push("/formulario-insumo");
     },
@@ -120,7 +191,7 @@ export default {
         Swal.close();
         if (error.response.status === 404) {
           Swal.fire({
-            icon: "error",
+            icon: "info",
             title: "No se encontraron elementos...",
             text: "Parece que no hay ningun insumo registrado.",
           });

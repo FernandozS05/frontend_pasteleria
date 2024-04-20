@@ -30,7 +30,7 @@ import ListadoProductosCatalogoView from '@/views/Catalogo/ListadoProductosCatal
 const routes = [
   {
     path: '/',
-    name: 'login',
+    name: 'Base',
     component: LoginUsuarioView
   },
   {
@@ -40,68 +40,68 @@ const routes = [
   },
   {
     path: '/login',
-    name: 'login',
+    name: 'LoginUsuario',
     component: LoginUsuarioView
   },
   {
     path: '/producto',
-    name: 'producto',
+    name: 'Producto',
     component: ProductoCatalogoView
   },
   {
     path: '/catalogo',
-    name: 'catalogoProductos',
+    name: 'CatalogoProductos',
     component: CatalogoPastelesView
   },
   {
     path: '/pedido',
-    name: 'pedido',
+    name: 'Pedido',
     component: DetallesPedidoView
   },
   {
     path: '/tarjeta',
-    name: 'tarjeta',
+    name: 'Tarjeta',
     component: PagoTarjetaView
   },
   {
     path: '/formato',
-    name: 'formato',
+    name: 'Formato',
     component: PagoFormatoView
   },
   {
     path: '/pedidos',
-    name: 'pedidosview',
+    name: 'Pedidos',
     component: PedidosView
   },
   {
     path: '/direccion',
-    name: 'direccion',
+    name: 'Direccion',
     component: FormularioDireccionView
   },
   {
     path: '/elementoPedido',
-    name: 'elementoPedido',
+    name: 'ElementoPedido',
     component: ElementoPedidoView
   },
   {
     path: '/tablaVentas',
-    name: 'tablaVentas',
+    name: 'TablaVentas',
     component: TablaVentasView
   },
   {
     path: '/elementoVenta',
-    name: 'elementoVenta',
+    name: 'ElementoVenta',
     component: ElementoVentaView
   },
   {
     path: '/reportes',
-    name: 'reportes',
+    name: 'Reportes',
     component: ReporteVentasView,
   },
   {
 
     path: '/registro-pedido',
-    name: 'registroPedido',
+    name: 'RegistroPedido',
     component: DetallesPedidoView
   },
   {
@@ -181,7 +181,7 @@ const routes = [
   },
   {
     path: '/about',
-    name: 'about',
+    name: 'About',
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
@@ -190,7 +190,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes
 })
 
