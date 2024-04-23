@@ -142,45 +142,58 @@ export default {
       }
     },
     async obtenerDatosProducto() {
-      Swal.fire({
-        title: 'Producto personalizado',
-        html: `
-      <input type="text" id="nombre" class="swal2-input" placeholder="Nombre">
-      <input type="number" id="precio" class="swal2-input" placeholder="Precio" min="1">
-      <input type="text" id="descripcion" class="swal2-input" placeholder="Descripción">
-      <input type="number" id="cantidad" class="swal2-input" placeholder="Cantidad de productos" min="1">
-      <input type="number" id="horas" class="swal2-input" placeholder="Horas de trabajo" min="1">
-    `,
+      const { value: formValues } = await Swal.fire({
+        title: 'Detalles del Producto',
+        html:
+          '<input id="swal-input1" class="swal2-input" placeholder="Nombre del Producto">' +
+          '<input id="swal-input2" class="swal2-input" type="number" placeholder="Precio (solo números)">' +
+          '<input id="swal-input3" class="swal2-input" placeholder="Descripción">' +
+          '<input id="swal-input4" class="swal2-input" type="number" placeholder="Horas de Trabajo (solo números)">' +
+          '<input id="swal-input5" class="swal2-input" type="number" placeholder="Cantidad (solo números)">',
         focusConfirm: false,
         preConfirm: () => {
-          const nombre = document.getElementById('nombre').value;
-          const precio = parseFloat(document.getElementById('precio').value);
-          const descripcion = document.getElementById('descripcion').value;
-          const cantidad = parseInt(document.getElementById('cantidad').value);
-          const horas = parseFloat(document.getElementById('horas').value);
+          let nombreProducto = document.getElementById('swal-input1').value;
+          let precio = document.getElementById('swal-input2').value;
+          let descripcion = document.getElementById('swal-input3').value;
+          let horasTrabajo = document.getElementById('swal-input4').value;
+          let cantidad = document.getElementById('swal-input5').value;
 
-          if (!nombre || parseInt(precio) <= 0 || !descripcion || parseInt(cantidad) <= 0 || parseInt(horas) <= 0) {
-            Swal.showValidationMessage('Por favor, complete todos los campos correctamente y asegúrese de que los números sean mayores que cero.');
-            console.log(nombre, precio, descripcion, cantidad, horas)
+          // Validación de cada entrada
+          if (!nombreProducto.trim()) {
+            Swal.showValidationMessage("Por favor ingrese el nombre del producto.");
             return false;
           }
-          return { nombre, precio, descripcion, cantidad, horas };
-        },
-        confirmButtonText: 'Guardar',
-        showCancelButton: true,
-        cancelButtonText: 'Cancelar',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          console.log(result.value);
-          Swal.fire(
-            'Guardado!',
-            'El producto ha sido registrado.',
-            'success'
-          );
+          if (!precio || precio <= 0) {
+            Swal.showValidationMessage("Por favor ingrese un precio válido (solo números mayores a 0).");
+            return false;
+          }
+          if (!descripcion.trim()) {
+            Swal.showValidationMessage("Por favor ingrese una descripción.");
+            return false;
+          }
+          if (!horasTrabajo || horasTrabajo <= 0) {
+            Swal.showValidationMessage("Por favor ingrese las horas de trabajo válidas (solo números mayores a 0).");
+            return false;
+          }
+          if (!cantidad || cantidad <= 0) {
+            Swal.showValidationMessage("Por favor ingrese una cantidad válida (solo números mayores a 0).");
+            return false;
+          }
+
+          return {
+            nombre: nombreProducto,
+            precio: parseFloat(precio),
+            descripcion: descripcion,
+            horas: parseInt(horasTrabajo),
+            cantidad: parseInt(cantidad)
+          };
         }
       });
-    },
 
+      if (formValues) {
+        return formValues;
+      }
+    },
     async confirmarPedido(cliente, infoProducto) {
       const idUsuario = localStorage.getItem("idUsuario");
       const datos = {
@@ -188,6 +201,7 @@ export default {
         cliente: cliente,
         lugar_realizado: "Sucursal",
         productos: [{
+          id: "",
           nombre: infoProducto.nombre,
           precio: infoProducto.precio,
           horas_trabajo: infoProducto.horas,
@@ -232,30 +246,23 @@ export default {
       }
     },
     async realizarRegistroPedido(datos) {
-      const url = apiEmpleado.registrarPedido;
-      toast
-        .promise(
-          axios.post(url, datos, { withCredentials: true }),
-          {
-            pending: "Registrando pedido...",
-            success: "Pedido registrado correctamente.",
-            error: "No se pudo registrar pedido"
-          },
-          toastConf
-        )
-        .then((respuesta) => {
-          if (respuesta.status === 200) {
-            const idPedido = respuesta.data.id_pedido;
-            localStorage.setItem("idPedido", idPedido);
-            this.$router.push("/registro-pedido");
-          }
-        })
-        .catch((error) => {
-          this.manejarError(error);
-        });
-    }
-    ,
+      try {
+        const url = apiEmpleado.registrarPedidoPersonalizado;
 
+        const respuesta = await axios.post(url, datos);
+
+        if (respuesta.status === 200) {
+          console.log(respuesta);
+          const idPedido = respuesta.data.id_pedido;
+          localStorage.setItem("idPedido", idPedido);
+          this.$router.push("/registro-pedido");
+        }
+
+      } catch (error) {
+        console.log(error);
+        this.manejarError(error);
+      }
+    },
     editarCatalogo() {
       this.$router.push("/productos-catalogo");
     },
@@ -362,6 +369,42 @@ export default {
       this.productosFiltrados = this.productos.filter(producto =>
         producto.nombre.toLowerCase().includes(texto.toLowerCase())
       );
+    },
+    manejarError(error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          this.$router.push("/login");
+          Swal.fire({
+            icon: "error",
+            title: "Error...",
+            text: "No autorizado.",
+          });
+        } else if (error.response.status === 404) {
+          Swal.fire({
+            icon: "error",
+            title: "Error...",
+            text: "Información no encontrada.",
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error...",
+            text: "Error en la solicitud.",
+          });
+        }
+      } else if (error.request) {
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Error de red.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error...",
+          text: "Error desconocido.",
+        });
+      }
     },
   },
   mounted() {

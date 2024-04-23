@@ -28,6 +28,7 @@ const apiEmpleado = {
   venderProductoInventario: ruta + "/inventario/vender-producto",
   //Pedidos
   registrarPedido: ruta + "/pedidos/registrar",
+  registrarPedidoPersonalizado: ruta + "/pedidos/registrar-personalizado",
   listarPedidos: ruta + "/pedidos/",
   asignarEntrega: ruta + "/pedidos/",
   consultarCancelacion: ruta + "/pedidos/consultar-cancelacion/",

@@ -261,25 +261,10 @@ export default {
           allowEscapeKey: false,
           allowEnterKey: false
         });
-        const respuesta = await axios.post(url, datos, { responseType: "blob" });
-
+        const respuesta = await axios.post(url, datos);
+        
         if (respuesta.status === 200) {
           Swal.close();
-          const blob = new Blob([respuesta.data], {
-            type: "application/pdf",
-          });
-
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-
-          a.href = url;
-          a.download = "Factura_compra.pdf";
-
-          document.body.appendChild(a);
-          a.click();
-
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
 
           await Swal.fire({
             position: "center",
