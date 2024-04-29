@@ -23,10 +23,10 @@ import CambiarContrasenaEmpleadoView from '@/views/RestablecerContrasena/Cambiar
 import ListadoEmpleadosView from '@/views/Registro/ListadoEmpleadosView.vue'
 import FormularioEmpleadoView from '@/views/Registro/FormularioEmpleadoView.vue'
 import ModificarInsumoView from '@/views/Inventario/ModificarInsumoView.vue'
-import ModificarEntregaView from '@/views/Entregas/ModificarEntregaView.vue'
 import ListadoProductosInventarioView from '@/views/Inventario/ListadoProductosInventarioView.vue'
 import FormularioProductoView from '@/views/Producto/FormularioProductoView.vue'
 import ListadoProductosCatalogoView from '@/views/Catalogo/ListadoProductosCatalogoView.vue'
+import ModificarEntregaView from '../views/Pedido/ModificarEntregaView.vue'
 const routes = [
   {
     path: '/',

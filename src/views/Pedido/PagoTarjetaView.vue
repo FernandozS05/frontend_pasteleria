@@ -39,6 +39,7 @@ export default {
         }, toastConf
       ).then((respuesta) => {
         if (respuesta.status === 200) {
+          console.log(respuesta.data)
           this.pedido = respuesta.data;
         }
       }).catch((error) => {

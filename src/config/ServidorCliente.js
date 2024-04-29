@@ -17,7 +17,9 @@ const apiCliente = {
   listarPedidos: ruta + "/pedidos/consultar",
   asignarEntrega: ruta + "/pedidos/asignar-entrega/",
   consultarCancelacion: ruta + "/pedidos/consultar-cancelacion/",
+  consultarModificacion: ruta + "/pedidos/consultar-modificacion/",
   cancelarPedido: ruta + "/pedidos/cancelar-pedido/",
+  entregarPedido: ruta + "/pedidos/marcar-entregado/",
   //Pagos
   generarPago: ruta + "/pagos/generar-formato",
   registrarPago: ruta + "/pagos/registrar-pago/",

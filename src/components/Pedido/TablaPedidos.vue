@@ -26,12 +26,7 @@
     <tbody>
       <tr v-for="(pedido, index) in pedidos" :key="index">
         <td class="d-flex">
-          <img
-            class="img-fluid mx-2 align-self-start"
-            src="../../assets/icono-pedido.png"
-            alt=""
-          />
-          <p class="fs-5 align-self-end">
+          <p class="fs-5 align-self-center">
             {{ pedido.id }}
           </p>
         </td>

@@ -112,13 +112,6 @@ export default {
         })
         .catch((error) => {
           if (error.response) {
-            //console.error("Mensaje del servidor:", error.response.data.error);
-            Swal.fire({
-              icon: "error",
-              title: "Error...",
-              text: ("Mensaje del servidor:", error.response.data.error),
-            });
-
             if (error.response.status === 401) {
               Swal.fire({
                 icon: "error",

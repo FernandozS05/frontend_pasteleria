@@ -75,7 +75,7 @@
           </option>
         </select>
         <h4 class="mt-4">Método de pago:</h4>
-        <div class="form-check">
+        <div v-if="this.tipoUsuario != 'empresa'" class="form-check">
           <input
             type="radio"
             class="form-check-input"
@@ -134,6 +134,7 @@ export default {
       tipoEntrega: "",
       domicilio: "",
       indicacionesExtra: "",
+      tipoUsuario: ""
     };
   },
   methods: {
@@ -380,6 +381,7 @@ export default {
   },
   mounted() {
     this.consultarAgenda();
+    this.tipoUsuario = localStorage.getItem("tipoUsuario");
   },
 };
 </script>

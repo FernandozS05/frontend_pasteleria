@@ -199,29 +199,65 @@ export default {
       const result = await Swal.fire({
         title: 'Datos del cliente',
         html: `
+      <style>
+        .swal2-input, .swal2-select {
+          width: 100%; /* Asegura que los campos usen todo el ancho disponible */
+          box-sizing: border-box; /* Añade el padding y border dentro del ancho y alto del elemento */
+          margin: 8px 0; /* Añade un margen uniforme */
+        }
+      </style>
       <input type="text" id="nombre" class="swal2-input" placeholder="Nombre completo">
       <input type="text" id="rfc" class="swal2-input" placeholder="RFC">
+      <select id="razon-social" class="swal2-select">
+        <option value="" disabled selected>Razón Social</option>
+        <option value="Persona Física">Persona Física</option>
+        <option value="Persona Moral">Persona Moral</option>
+        <option value="Autónomo">Autónomo</option>
+        <option value="Empresa Pública">Empresa Pública</option>
+        <option value="Empresa Privada">Empresa Privada</option>
+        <option value="ONG">ONG</option>
+      </select>
+      <input type="text" id="direccion" class="swal2-input" placeholder="Dirección">
       <input type="email" id="correo" class="swal2-input" placeholder="Correo electrónico">
+      <select id="uso-factura" class="swal2-select">
+        <option value="" disabled selected>Uso de Factura</option>
+        <option value="Gastos Generales">Gastos Generales</option>
+        <option value="Inversión">Inversión</option>
+        <option value="Costo de Venta">Costo de Venta</option>
+        <option value="Gastos Operativos">Gastos Operativos</option>
+        <option value="Otros">Otros</option>
+      </select>
     `,
         focusConfirm: false,
         preConfirm: () => {
           const nombre = document.getElementById('nombre').value;
           const rfc = document.getElementById('rfc').value;
+          const razonSocial = document.getElementById('razon-social').value;
+          const direccion = document.getElementById('direccion').value;
           const correo = document.getElementById('correo').value;
+          const usoFactura = document.getElementById('uso-factura').value;
 
-          if (!nombre || !rfc || rfc.length !== 13 || !correo) {
+          // Validación de campos
+          if (!nombre || !rfc || rfc.length !== 13 || !razonSocial || !direccion || !correo || !usoFactura) {
             Swal.showValidationMessage('Por favor, complete todos los campos correctamente.');
             return false;
           }
-          return { nombre : nombre, rfc : rfc, correo: correo };
+          return {
+            nombre,
+            rfc,
+            razon: razonSocial,
+            direccion,
+            correo,
+            usoFactura
+          };
         },
         confirmButtonText: 'Generar Factura',
         showCancelButton: true,
         cancelButtonText: 'Cancelar',
       });
+
       return result.isConfirmed ? result.value : null;
     },
-
     async preguntarFactura(producto) {
       const resultado = await Swal.fire({
         title: "¿Desea generar una factura para esta venta?",
@@ -238,14 +274,17 @@ export default {
         if (datosCliente) {
           const datosFactura = {
             cliente: datosCliente,
-            productos: [{ nombre: producto.nombre, cantidad: 1, precio: producto.precio }],
+            productos: [{
+              nombre: producto.nombre,
+              cantidad: 1,
+              precio: producto.precio
+            }],
           };
           console.log(datosFactura);
           await this.generarFactura(datosFactura);
         }
       }
-    }
-    ,
+    },
     async generarFactura(datos) {
 
       try {
@@ -262,7 +301,7 @@ export default {
           allowEnterKey: false
         });
         const respuesta = await axios.post(url, datos);
-        
+
         if (respuesta.status === 200) {
           Swal.close();
 

@@ -3,7 +3,7 @@
       <BarraNavegacion @cerrarSesion="cerrarSesion"/>
     </div>
     <div class="row">
-      <ElementoPedido v-if="mostrar == true" v-bind:detalles="pedido" v-bind:entrega="entrega" v-bind:pagoAnticipo="pagoAnticipo" v-bind:pagoLiquidacion="pagoLiquidacion"/>
+      <ElementoPedido v-if="mostrar == true" v-bind:detalles="pedido" v-bind:entrega="pedido.entrega" v-bind:pagoAnticipo="pedido.pago_anticipo" v-bind:pagoLiquidacion="pedido.pago_liquidacion"/>
     </div>
 </template>
   
@@ -46,12 +46,6 @@ export default {
         if (respuesta.status === 200) {
           this.pedido = respuesta.data;
           console.log(respuesta.data);
-          if(this.pedido.id_entrega)
-            await this.consultarEntrega();
-          if(this.pedido.id_anticipo)
-            await this.consultarPagoAnticipo();
-          if(this.pedido.id_liquidacion)
-            await this.consultarPagoLiquidacion();
          this.mostrar = true;
         }
       }).catch((error) => {

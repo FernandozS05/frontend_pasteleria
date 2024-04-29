@@ -145,45 +145,96 @@ export default {
       const { value: formValues } = await Swal.fire({
         title: 'Detalles del Producto',
         html:
-          '<input id="swal-input1" class="swal2-input" placeholder="Nombre del Producto">' +
-          '<input id="swal-input2" class="swal2-input" type="number" placeholder="Precio (solo números)">' +
-          '<input id="swal-input3" class="swal2-input" placeholder="Descripción">' +
-          '<input id="swal-input4" class="swal2-input" type="number" placeholder="Horas de Trabajo (solo números)">' +
-          '<input id="swal-input5" class="swal2-input" type="number" placeholder="Cantidad (solo números)">',
+          `<style>
+        .swal2-popup {
+          width: auto !important;
+          max-width: 1000px; 
+        }
+        .swal2-input, .swal2-select, .swal2-textarea {
+          width: 100%; 
+          box-sizing: border-box; 
+          margin: 0.8em 0;
+        }
+      </style>` +
+          '<input id="swal-input1" class="swal2-input form-control" placeholder="Nombre del Producto">' +
+          '<input id="swal-input2" class="swal2-input form-control" type="number" placeholder="Precio (solo números)">' +
+          '<select id="swal-input-size" class="swal2-input form-control">' +
+          '<option disabled selected>Tamaño</option>' +
+          '<option>Pequeño</option>' +
+          '<option>Mediano</option>' +
+          '<option>Grande</option>' +
+          '<option>Extra grande</option>' +
+          '</select>' +
+          '<select id="swal-input-shape" class="swal2-input form-control">' +
+          '<option disabled selected>Forma</option>' +
+          '<option>Redondo</option>' +
+          '<option>Cuadrado</option>' +
+          '<option>Rectangular</option>' +
+          '<option>Forma de corazón</option>' +
+          '<option>Números</option>' +
+          '<option>Letras</option>' +
+          '<option>Formas especiales</option>' +
+          '</select>' +
+          '<select id="swal-input-dough" class="swal2-input form-control">' +
+          '<option disabled selected>Tipo de masa</option>' +
+          '<option>Vainilla</option>' +
+          '<option>Chocolate</option>' +
+          '<option>Fresa</option>' +
+          '<option>Red velvet</option>' +
+          '<option>Limón</option>' +
+          '<option>Naranja</option>' +
+          '<option>Almendra</option>' +
+          '<option>Sin gluten</option>' +
+          '<option>Vegano</option>' +
+          '<option>Bajo en azúcar</option>' +
+          '</select>' +
+          '<select id="swal-input-filling" class="swal2-input form-control">' +
+          '<option disabled selected>Relleno</option>' +
+          '<option>Crema pastelera</option>' +
+          '<option>Mousse de chocolate</option>' +
+          '<option>Mousse de vainilla</option>' +
+          '<option>Dulce de leche</option>' +
+          '<option>Crema de almendra</option>' +
+          '<option>Fresas</option>' +
+          '<option>Frambuesas</option>' +
+          '<option>Mango</option>' +
+          '</select>' +
+          '<select id="swal-input-cover" class="swal2-input form-control">' +
+          '<option disabled selected>Cobertura</option>' +
+          '<option>Fondant</option>' +
+          '<option>Crema de mantequilla</option>' +
+          '<option>Ganache de chocolate</option>' +
+          '<option>Glaseado espejo</option>' +
+          '</select>' +
+          '<textarea id="swal-input3" class="swal2-textarea form-control" placeholder="Observaciones"></textarea>' + // Cambiado a textarea
+          '<input id="swal-input4" class="swal2-input form-control" type="number" placeholder="Horas de Trabajo (solo números)">' +
+          '<input id="swal-input5" class="swal2-input form-control" type="number" placeholder="Cantidad (solo números)">',
         focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
         preConfirm: () => {
-          let nombreProducto = document.getElementById('swal-input1').value;
-          let precio = document.getElementById('swal-input2').value;
-          let descripcion = document.getElementById('swal-input3').value;
-          let horasTrabajo = document.getElementById('swal-input4').value;
-          let cantidad = document.getElementById('swal-input5').value;
+          const nombreProducto = document.getElementById('swal-input1').value;
+          const precio = document.getElementById('swal-input2').value;
+          const size = document.getElementById('swal-input-size').value;
+          const shape = document.getElementById('swal-input-shape').value;
+          const dough = document.getElementById('swal-input-dough').value;
+          const filling = document.getElementById('swal-input-filling').value;
+          const cover = document.getElementById('swal-input-cover').value;
+          const descripcion = document.getElementById('swal-input3').value;
+          const horasTrabajo = document.getElementById('swal-input4').value;
+          const cantidad = document.getElementById('swal-input5').value;
 
-          // Validación de cada entrada
-          if (!nombreProducto.trim()) {
-            Swal.showValidationMessage("Por favor ingrese el nombre del producto.");
-            return false;
-          }
-          if (!precio || precio <= 0) {
-            Swal.showValidationMessage("Por favor ingrese un precio válido (solo números mayores a 0).");
-            return false;
-          }
-          if (!descripcion.trim()) {
-            Swal.showValidationMessage("Por favor ingrese una descripción.");
-            return false;
-          }
-          if (!horasTrabajo || horasTrabajo <= 0) {
-            Swal.showValidationMessage("Por favor ingrese las horas de trabajo válidas (solo números mayores a 0).");
-            return false;
-          }
-          if (!cantidad || cantidad <= 0) {
-            Swal.showValidationMessage("Por favor ingrese una cantidad válida (solo números mayores a 0).");
+          if (!nombreProducto || !precio || !descripcion || !horasTrabajo || !cantidad || !size || !shape || !dough || !filling || !cover) {
+            Swal.showValidationMessage("Por favor complete todos los campos.");
             return false;
           }
 
+          let fullDescription = `Tamaño ${size},\n Forma ${shape},\n Masa de ${dough},\n Relleno de ${filling},\n Cobertura de ${cover},\ncomo observaciones ${descripcion}`;
           return {
             nombre: nombreProducto,
             precio: parseFloat(precio),
-            descripcion: descripcion,
+            descripcion: fullDescription,
             horas: parseInt(horasTrabajo),
             cantidad: parseInt(cantidad)
           };
@@ -194,6 +245,10 @@ export default {
         return formValues;
       }
     },
+
+
+
+
     async confirmarPedido(cliente, infoProducto) {
       const idUsuario = localStorage.getItem("idUsuario");
       const datos = {

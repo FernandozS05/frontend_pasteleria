@@ -7,9 +7,7 @@
             Descarga el formato de pago, paga en la sucursal mas cercana y
             despues ingresa el folio del pago.
           </p>
-          <a class="button rght border download" @click="descargarFormato"
-            >Descargar Formato</a
-          >
+          <a class="button rght border download" @click="descargarFormato">Descargar Formato</a>
         </div>
         <div id="contenedorRegistro">
           <label for="inputFolio">
@@ -19,16 +17,11 @@
           </label>
           <form id="inputFolio" @submit.prevent="registrarPago">
             <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label"
-                ><p class="fs-5">Folio de pago</p></label
-              >
-              <input
-                v-model="folio"
-                type="number"
-                class="form-control"
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-              />
+              <label for="exampleInputEmail1" class="form-label">
+                <p class="fs-5">Folio de pago</p>
+              </label>
+              <input v-model="folio" type="number" class="form-control" id="exampleInputEmail1"
+                aria-describedby="emailHelp" />
             </div>
             <button type="submit" class="button rght border download">
               Registrar
@@ -160,7 +153,7 @@ export default {
               showConfirmButton: false,
               timer: 1500,
             });
-
+            await this.preguntarFactura(this.pedido.productos);
             this.$router.push("/pedidos");
           }
         })
@@ -202,6 +195,126 @@ export default {
           title: "Error...",
           text: "Error desconocido.",
         });
+      }
+    },
+    async obtenerDatosCliente() {
+      const result = await Swal.fire({
+        title: 'Datos del cliente',
+        html: `
+      <style>
+        .swal2-input, .swal2-select {
+          width: 100%; /* Asegura que los campos usen todo el ancho disponible */
+          box-sizing: border-box; /* Añade el padding y border dentro del ancho y alto del elemento */
+          margin: 8px 0; /* Añade un margen uniforme */
+        }
+      </style>
+      <input type="text" id="nombre" class="swal2-input" placeholder="Nombre completo">
+      <input type="text" id="rfc" class="swal2-input" placeholder="RFC">
+      <select id="razon-social" class="swal2-select">
+        <option value="" disabled selected>Razón Social</option>
+        <option value="Persona Física">Persona Física</option>
+        <option value="Persona Moral">Persona Moral</option>
+        <option value="Autónomo">Autónomo</option>
+        <option value="Empresa Pública">Empresa Pública</option>
+        <option value="Empresa Privada">Empresa Privada</option>
+        <option value="ONG">ONG</option>
+      </select>
+      <input type="text" id="direccion" class="swal2-input" placeholder="Dirección">
+      <input type="email" id="correo" class="swal2-input" placeholder="Correo electrónico">
+      <select id="uso-factura" class="swal2-select">
+        <option value="" disabled selected>Uso de Factura</option>
+        <option value="Gastos Generales">Gastos Generales</option>
+        <option value="Inversión">Inversión</option>
+        <option value="Costo de Venta">Costo de Venta</option>
+        <option value="Gastos Operativos">Gastos Operativos</option>
+        <option value="Otros">Otros</option>
+      </select>
+    `,
+        focusConfirm: false,
+        preConfirm: () => {
+          const nombre = document.getElementById('nombre').value;
+          const rfc = document.getElementById('rfc').value;
+          const razonSocial = document.getElementById('razon-social').value;
+          const direccion = document.getElementById('direccion').value;
+          const correo = document.getElementById('correo').value;
+          const usoFactura = document.getElementById('uso-factura').value;
+
+          // Validación de campos
+          if (!nombre || !rfc || rfc.length !== 13 || !razonSocial || !direccion || !correo || !usoFactura) {
+            Swal.showValidationMessage('Por favor, complete todos los campos correctamente.');
+            return false;
+          }
+          return {
+            nombre,
+            rfc,
+            razon: razonSocial,
+            direccion,
+            correo,
+            usoFactura
+          };
+        },
+        confirmButtonText: 'Generar Factura',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+      });
+
+      return result.isConfirmed ? result.value : null;
+    },
+    async preguntarFactura(productos) {
+      const resultado = await Swal.fire({
+        title: "¿Desea generar una factura para esta venta?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, generar factura"
+      });
+
+      if (resultado.isConfirmed) {
+        const datosCliente = await this.obtenerDatosCliente();
+
+        if (datosCliente) {
+          const datosFactura = {
+            cliente: datosCliente,
+            productos: productos,
+          };
+          console.log(datosFactura);
+          await this.generarFactura(datosFactura);
+        }
+      }
+    },
+    async generarFactura(datos) {
+
+      try {
+        const url = apiCliente.generarFactura;
+        console.log(url);
+        Swal.fire({
+          title: 'Registrando venta...',
+          text: 'Por favor, espere.',
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          allowEnterKey: false
+        });
+        const respuesta = await axios.post(url, datos);
+
+        if (respuesta.status === 200) {
+          Swal.close();
+
+          await Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Factura enviada exitosamente.",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      } catch (error) {
+        Swal.close();
+        console.log(error);
+        this.manejarError(error);
       }
     },
     redirigirATablaPedidos() {

@@ -7,7 +7,7 @@
 
           <!-- Detalles de entrega a domicilio -->
           <h4 class="mt-4">Método de pago:</h4>
-          <div class="form-check">
+          <div v-if="!this.tipo == 'empresa'" class="form-check">
             <input type="radio" class="form-check-input" name="metodoPago" id="pagoTarjeta" value="tarjeta"
               v-model="tipoPago" />
             <label class="form-check-label" for="pagoTarjeta">
@@ -41,9 +41,20 @@
   name:"DetallePedido",
   data(){
     return {
-      tipoPago: ""
+      tipoPago: "",
+      tipo: ""
     }},
     methods: {
+      async definirTipo() {
+      const tipo = localStorage.getItem("tipoUsuario");
+
+      if (!tipo) {
+
+        this.$router.push("/login");
+        return;
+      }
+      this.tipo = tipo;
+    },
      irAPagar(){
         if(this.tipoPago=="tarjeta"){
             this.$router.push("/tarjeta");
@@ -55,6 +66,9 @@
      cancelar(){
       this.$router.back();
      }
+    },
+    mounted(){
+      this.definirTipo();
     }
   }
   </script>
