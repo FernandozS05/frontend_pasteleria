@@ -147,7 +147,7 @@
           Swal.fire({
             icon: "error",
             title: "Error...",
-            text: "Parece que algo salio mal...",
+            text: "Parece que algo salió mal...",
           });
         } else if (error.request) {
           Swal.fire({

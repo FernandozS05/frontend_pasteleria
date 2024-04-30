@@ -13,7 +13,7 @@
           <p class="fs-5 fw-medium align-self-end">Piezas</p>
         </th>
         <th>
-          <p class="fs-5 fw-medium align-self-end">Informacion</p>
+          <p class="fs-5 fw-medium align-self-end">Información</p>
         </th>
         <th>
           <p class="fs-5 fw-medium align-self-end">Editar</p>

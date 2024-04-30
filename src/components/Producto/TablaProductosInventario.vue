@@ -121,7 +121,7 @@ export default {
           if (result.isConfirmed) {
             await Swal.fire({
               title: `Venta de producto`,
-              text: "Realiza el cobro al cliente y despues genera el ticket.",
+              text: "Realiza el cobro al cliente y después genera el ticket.",
               focusConfirm: true,
               confirmButtonText: "Generar ticket",
               cancelButtonText: "Cancelar",
@@ -137,7 +137,7 @@ export default {
         });
 
       } catch (error) {
-        console.error("Error al consultar drogas: ", error);
+        console.error("Error al consultar: ", error);
         return false;
       }
     },
@@ -342,7 +342,7 @@ export default {
         Swal.fire({
           icon: "error",
           title: "Error...",
-          text: "Parece que algo salio mal...",
+          text: "Parece que algo salió mal...",
         });
       } else if (error.request) {
         Swal.fire({

@@ -164,7 +164,7 @@ export default {
           {
             pending: "Registrando pedido...",
             success: "Pedido registrado correctamente.",
-            error: "No se pudo registrar pedido",
+            error: "No se pudo registrar el pedido",
           },
           toastConf
         )

@@ -126,7 +126,7 @@ export default {
           Swal.fire({
             icon: "info",
             title: "No se encontraron elementos...",
-            text: "Parece que no hay ningun producto en el inventario.",
+            text: "Parece que no hay ningún producto en el inventario.",
           });
         }
         else if (error.request) {
@@ -150,7 +150,7 @@ export default {
         Swal.fire({
           icon: "error",
           title: "Error...",
-          text: "Parece que algo salio mal...",
+          text: "Parece que algo salió mal...",
         });
         if (error.response.status === 401) {
           Swal.fire({

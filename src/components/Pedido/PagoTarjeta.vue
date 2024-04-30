@@ -217,7 +217,7 @@ export default {
           parseInt(this.pedido.total) -
           Math.round(parseInt(this.pedido.total) / 2),
         metodo_pago: "Tarjeta",
-        sucursal: this.revisar() ? "Sucursal principal." : "Tienda en linea.",
+        sucursal: this.revisar() ? "Sucursal principal." : "Tienda en línea.",
         anticipado: anticipado,
       };
       toast

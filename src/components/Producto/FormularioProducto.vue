@@ -13,7 +13,7 @@
           <input type="number" v-model="precio" id="precio" class="form-control" required />
         </div>
         <div v-if="this.ubicacion =='catalogo'" class="mb-3">
-          <label for="horas" class="form-label">Horas de trabajo para elaboracion:</label>
+          <label for="horas" class="form-label">Horas de trabajo para elaboración:</label>
           <input type="number" v-model="horas_trabajo" id="horas" class="form-control" required />
         </div>
         <div class="mb-3">
@@ -85,7 +85,7 @@ export default {
         Swal.fire({
           icon: "error",
           title: "Error...",
-          text: "Parece que algo salio mal...",
+          text: "Parece que algo salió mal...",
         });
         if (error.response.status === 401) {
           Swal.fire({
@@ -194,7 +194,7 @@ export default {
           Swal.close();
           await Swal.fire({
             icon: "success",
-            title: idProducto ? "Actualizacion compleatada" : "Registro completado",
+            title: idProducto ? "Actualización compleatada" : "Registro completado",
             text: `Producto ${idProducto ? 'actualizado' : 'registrado'} correctamente.`,
           });
           localStorage.removeItem("idProducto");

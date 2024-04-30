@@ -19,7 +19,7 @@
               <button type="button"
                 class="btn btn-success boton-agregar text-nowrap ms-5 d-flex align-items-center justify-content-evenly text-center p-1 boton-hover"
                 @click="verCatalogo">
-                Ver catalogo
+                Ver catálogo
               </button>
             </p>
           </div>
@@ -127,7 +127,7 @@ export default {
           Swal.fire({
             icon: "error",
             title: "No se encontraron elementos...",
-            text: "Parece que no hay ningun producto en el catalogo.",
+            text: "Parece que no hay ningún producto en el catalogo.",
           });
         }
         else if (error.request) {
@@ -151,7 +151,7 @@ export default {
         Swal.fire({
           icon: "error",
           title: "Error...",
-          text: "Parece que algo salio mal...",
+          text: "Parece que algo salió mal...",
         });
         if (error.response.status === 401) {
           Swal.fire({
