@@ -124,7 +124,7 @@ export default {
               Swal.fire({
                 icon: "error",
                 title: "Error...",
-                text: ("Usuario no encontrado.", toastConf),
+                text: "Usuario no encontrado.",
               });
             }
           } else if (error.request) {
@@ -132,14 +132,14 @@ export default {
             Swal.fire({
               icon: "error",
               title: "Error...",
-              text: ("Error de red", toastConf),
+              text: "Error de red",
             });
           } else {
             //toast.error("Error desconocido", toastConf);
             Swal.fire({
               icon: "error",
               title: "Error...",
-              text: ("Error desconocido", toastConf),
+              text: "Error desconocido",
             });
           }
         });
