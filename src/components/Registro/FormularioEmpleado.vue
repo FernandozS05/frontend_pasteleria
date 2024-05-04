@@ -168,7 +168,7 @@ export default {
           Swal.close();
           await Swal.fire({
             icon: "success",
-            title: idEmpleado ? "Actualizacion compleatada" : "Registro completado",
+            title: idEmpleado ? "Actualización compleatada" : "Registro completado",
             text: `Usuario ${idEmpleado ? 'actualizado' : 'registrado'} correctamente.`,
           });
           localStorage.removeItem("idEmpleado");
@@ -231,7 +231,7 @@ export default {
         Swal.fire({
           icon: "error",
           title: "Error...",
-          text: "Parece que algo salio mal...",
+          text: "Parece que algo salió mal...",
         });
         if (error.response.status === 401) {
           Swal.fire({

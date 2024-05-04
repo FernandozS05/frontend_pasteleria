@@ -4,8 +4,8 @@
       <div class="col-md-6 order-md-1 mt-5 p-3 border border-3 rounded-4">
         <div id="contenedorPago mb-3">
           <p class="fs-4 text-center">
-            Descarga el formato de pago, paga en la sucursal mas cercana y
-            despues ingresa el folio del pago.
+            Descarga el formato de pago, paga en la sucursal más cercana y
+            después ingresa el folio del pago.
           </p>
           <a class="button rght border download" @click="descargarFormato">Descargar Formato</a>
         </div>
@@ -58,7 +58,7 @@ export default {
         concepto:
           this.pedido.estado == "Pendiente"
             ? "Pago anticipo."
-            : "Pago liquidacion.",
+            : "Pago liquidación.",
       };
       toast
         .promise(

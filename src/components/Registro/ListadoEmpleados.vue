@@ -108,7 +108,7 @@ export default {
             Swal.fire({
             icon: "error",
             title: "No se encontraron usuarios...",
-            text: "Parece que no hay ningun usuario registrado.",
+            text: "Parece que no hay ningún usuario registrado.",
           });
           }
         }
@@ -118,7 +118,7 @@ export default {
           Swal.fire({
             icon: "error",
             title: "No se encontraron usuarios...",
-            text: "Parece que no hay ningun usuario registrado.",
+            text: "Parece que no hay ningún usuario registrado.",
           });
         }
         else if (error.request) {
@@ -141,7 +141,7 @@ export default {
         Swal.fire({
           icon: "error",
           title: "Error...",
-          text: "Parece que algo salio mal...",
+          text: "Parece que algo salió mal...",
         });
         if (error.response.status === 401) {
           Swal.fire({

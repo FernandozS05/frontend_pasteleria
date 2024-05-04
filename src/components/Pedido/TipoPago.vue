@@ -3,7 +3,7 @@
       <div class="col-auto mt-3 ">
         <div class="p-3 border border-3 rounded-4">
   
-          <p class="fs-3">Elige un metodo de pago</p>
+          <p class="fs-3">Elige un método de pago</p>
 
           <!-- Detalles de entrega a domicilio -->
           <h4 class="mt-4">Método de pago:</h4>

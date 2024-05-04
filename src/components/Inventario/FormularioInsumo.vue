@@ -80,7 +80,7 @@ export default {
         Swal.fire({
           icon: "error",
           title: "Error...",
-          text: "Parece que algo salio mal...",
+          text: "Parece que algo salió mal...",
         });
         if (error.response.status === 401) {
           Swal.fire({
@@ -173,7 +173,7 @@ export default {
           Swal.close();
           await Swal.fire({
             icon: "success",
-            title: idInsumo ? "Actualizacion compleatada" : "Registro completado",
+            title: idInsumo ? "Actualización compleatada" : "Registro completado",
             text: `Insumo ${idInsumo ? 'actualizado' : 'registrado'} correctamente.`,
           });
           this.limpiarFormulario();

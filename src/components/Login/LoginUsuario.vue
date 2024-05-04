@@ -168,7 +168,7 @@ export default {
             Swal.fire({
               icon: 'success',
               title: 'Solicitud enviada',
-              text: 'El administrador se pondra en contacto con usted lo mas pronto posible.',
+              text: 'El administrador se pondra en contacto con usted lo más pronto posible.',
             })
           }
         })

@@ -35,7 +35,7 @@
         <div class="mb-3">
           <p class="fs-5 fw-medium">Pago anticipo</p>
           <div v-if="this.detalles.id_anticipo != null" class="row">
-            <p class="fs-6">{{ `Metodo pago: ${this.pagoAnticipo.metodo}` }}</p>
+            <p class="fs-6">{{ `Método pago: ${this.pagoAnticipo.metodo}` }}</p>
             <p class="fs-6">{{ `Folio: ${this.pagoAnticipo.folio}` }}</p>
             <p class="fs-6">{{ `Monto: $${this.pagoAnticipo.total}` }}</p>
             <p class="fs-6">{{ `Dirección: ${this.pagoAnticipo.direccion}` }}</p>
@@ -43,10 +43,10 @@
           <div v-else class="row">
             <p class="fs-6">{{ "Sin pago de anticipo registrado." }}</p>
           </div>
-          <p class="fs-5 fw-medium">Pago liquidacion</p>
+          <p class="fs-5 fw-medium">Pago liquidación</p>
           <div v-if="this.detalles.id_liquidacion != null" class="row">
             <p class="fs-6">
-              {{ `Metodo pago: ${this.pagoLiquidacion.metodo}` }}
+              {{ `Método pago: ${this.pagoLiquidacion.metodo}` }}
             </p>
             <p class="fs-6">{{ `Folio: ${this.pagoLiquidacion.folio}` }}</p>
             <p class="fs-6">{{ `Monto: $${this.pagoLiquidacion.total}` }}</p>
@@ -201,7 +201,7 @@ export default {
               {
                 pending: "Cancelando pedido ...",
                 success: "Pedido Cancelado.",
-                error: "Cancelacion interrumpida.",
+                error: "Cancelación interrumpida.",
               },
               toastConf
             )
