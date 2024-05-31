@@ -3,7 +3,8 @@
     <div class="row w-100 d-flex justify-content-center align-items-center">
       <div class="col-auto mt-3 p-2 border border-3 rounded-4">
         <h4 class="mt-4 mb-3">Detalles del Pedido</h4>
-        <p class="fs-6 mb-3">{{ `Cliente: ${this.detalles.cliente}` }}</p>
+        <p class="fs-6 mb-3">{{ `Nombre del cliente: ${this.detalles.cliente}` }}</p>
+        <p class="fs-6 mb-3">{{ `Teléfono del cliente: ${this.detalles.telefono}` }}</p>
         <p class="fs-6 mb-3">
           {{ `Realizado en: ${this.detalles.fecha_realizado.slice(0, 10)}` }}
         </p>
@@ -15,6 +16,14 @@
             {{
               `Fecha de entrega: ${this.entrega.fecha_entrega
                 ? this.entrega.fecha_entrega.slice(0, 10)
+                : "No disponible"
+              }`
+            }}
+          </p>
+          <p class="fs-6">
+            {{
+              `Entrega a partir de las : ${this.entrega.hora
+                ? this.entrega.hora
                 : "No disponible"
               }`
             }}

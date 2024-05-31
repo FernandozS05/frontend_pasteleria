@@ -1,24 +1,15 @@
 <template>
- 
+
   <div class="container d-flex">
-    <div class="col-auto mostrador flex-grow-1 d-flex p-3"  id="mostrador">
-      
-        <ProductoCatalogo 
-          v-for="(producto, index) in productos"
-          :key="index"
-          :imagen="producto.imagen"
-          :nombre="producto.nombre"
-          :descripcion="producto.descripcion"
-          :precio="producto.precio"
-          @detalle="cargar(index)"
-        />
-      
+    <div class="col-auto mostrador flex-grow-1 d-flex p-3" id="mostrador">
+
+      <ProductoCatalogo v-for="(producto, index) in productos" :key="index" :imagen="producto.imagen"
+        :nombre="producto.nombre" :descripcion="producto.descripcion" :precio="producto.precio"
+        @detalle="cargar(index)" />
+
     </div>
     <!-- CONTENEDOR DEL ITEM SELECCIONADO -->
-    <div
-      class="seleccion border border-4 rounded mt-3 me-3"
-      id="seleccion"
-    >
+    <div class="seleccion border border-4 rounded mt-3 me-3" id="seleccion">
       <div class="cerrar" @click="cerrar">Cerrar</div>
       <div class="info">
         <img class="img-fluid" v-bind:src="imagenSeleccionada" alt="" />
@@ -32,12 +23,8 @@
         <div class="row">
           <div class="row mb-3">
             <label for="selectorCantidad">Cantidad</label>
-            <select
-              id="selectorCantidad"
-              v-model="cantidadProducto"
-              class="form-select form-select-sm"
-              aria-label="Small select example"
-            >
+            <select id="selectorCantidad" v-model="cantidadProducto" class="form-select form-select-sm"
+              aria-label="Small select example">
               <option selected>Selecciona una cantidad</option>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -51,8 +38,8 @@
               <option value="10">10</option>
             </select>
           </div>
-          <button class="btn btn-primary boton" @click="registrarPedido">
-            Realizar pedido
+          <button class="btn btn-primary boton" @click="agregarProducto">
+            Agregar al carrito
           </button>
         </div>
       </div>
@@ -62,11 +49,9 @@
 
 <script>
 import ProductoCatalogo from "../Producto/ProductoCatalogo.vue";
-import apiCliente from "@/config/ServidorCliente";
-import axios from "@/config/axios.js";
-import { toast } from "vue3-toastify";
-import toastConf from "@/config/toast";
 import Swal from "sweetalert2";
+import apiArchivos from "@/config/ServidorArchivos";
+import axios from '@/config/axios.js';
 export default {
   name: "CatalogoProductos",
   props: {
@@ -90,8 +75,11 @@ export default {
     };
   },
   methods: {
-    cargar(index) {
+    async cargar(index) {
       const producto = this.productos[index];
+      if (!producto) {
+        return;
+      }
 
       let mostrador = document.getElementById("mostrador");
       let seleccion = document.getElementById("seleccion");
@@ -99,10 +87,10 @@ export default {
       this.nombreSeleccionada = producto.nombre;
       this.descripcionSeleccionada = producto.descripcion;
       this.precioSeleccionado = producto.precio;
-      this.imagenSeleccionada = producto.imagen;
+      this.imagenSeleccionada = await this.obtenerArchivoImagen(producto.imagen);
 
-    mostrador.classList.add("active");
-    seleccion.classList.add("active");
+      mostrador.classList.add("active");
+      seleccion.classList.add("active");
 
       mostrador.style.width = "60%";
       seleccion.style.width = "40%";
@@ -126,7 +114,6 @@ export default {
       }
       return false;
     },
-
     async obtenerNombreCliente() {
       const { value: nombre } = await Swal.fire({
         title: "¿A nombre de quién se hará el pedido?",
@@ -138,46 +125,27 @@ export default {
         return nombre;
       }
     },
-    async registrarPedido() {
-      let cliente = await this.obtenerNombreCliente();
-      if (!cliente) return;
-
-      const idUsuario = localStorage.getItem("idUsuario");
-
-      const url = apiCliente.registrarPedido;
-      const datos = {
-        usuario: idUsuario,
-        cliente: cliente,
-        lugar_realizado: this.revisar() ? "Sucursal" : "Internet",
-        productos: [
-          {
-            id: this.idSeleccionado,
-            cantidad: this.cantidadProducto,
-          },
-        ],
-        total: Math.ceil(this.precioSeleccionado * this.cantidadProducto),
-      };
-
-      toast
-        .promise(
-          axios.post(url, datos, { withCredentials: true }),
-          {
-            pending: "Registrando pedido...",
-            success: "Pedido registrado correctamente.",
-            error: "No se pudo registrar el pedido",
-          },
-          toastConf
-        )
-        .then((respuesta) => {
-          if (respuesta.status === 200) {
-            const idPedido = respuesta.data.id_pedido;
-            localStorage.setItem("idPedido", idPedido);
-            this.$router.push("/registro-pedido");
-          }
-        })
-        .catch((error) => {
-          this.manejarError(error);
+    async agregarProducto() {
+      console.log(this.productos);
+      const producto = this.productos.find(p => p.id === this.idSeleccionado);
+      if (producto) {
+        this.$emit('agregarProducto', {
+          producto: producto,
+          cantidad: this.cantidadProducto
         });
+      }
+    },
+    async obtenerArchivoImagen(ruta) {
+      try {
+        const url = `${apiArchivos.obtener}?ruta=${ruta}`;
+        const respuesta = await axios.get(url);
+        if (respuesta.status == 200) {
+          return respuesta.data.url;
+        }
+      } catch (e) {
+        console.log(e);
+        return null
+      }
     },
     manejarError(error) {
       if (error.response) {
@@ -217,8 +185,14 @@ export default {
     },
   },
   mounted() {
-    //this.cargar(0);
+    this.cargar(0);
   },
+  watch: {
+    productos() {
+      this.cargar(0);
+    },
+  }
+
 };
 </script>
 
@@ -234,16 +208,21 @@ export default {
 
 .mostrador {
   display: flex;
-  flex-wrap: wrap; /* Permite que los items se ajusten a la siguiente línea */
-  gap: 10px; /* Espacio entre los productos */
-  transition: all 0.3s ease; /* Suave transición para los cambios de tamaño */
+  flex-wrap: wrap;
+  /* Permite que los items se ajusten a la siguiente línea */
+  gap: 10px;
+  /* Espacio entre los productos */
+  transition: all 0.3s ease;
+  /* Suave transición para los cambios de tamaño */
 }
 
 .seleccion {
   transition: all 0.5s ease;
-  width: 0%; /* Inicia sin tomar espacio */
+  width: 0%;
+  /* Inicia sin tomar espacio */
   overflow: hidden;
-  flex-shrink: 0; /* Evita que se reduzca */
+  flex-shrink: 0;
+  /* Evita que se reduzca */
 }
 
 /* Cuando la selección está activa, ajusta los anchos */
@@ -371,6 +350,4 @@ export default {
   max-width: 100%;
   overflow-x: hidden;
 }
-
-
 </style>

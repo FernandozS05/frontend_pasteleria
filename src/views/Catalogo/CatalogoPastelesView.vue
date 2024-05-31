@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid p-0 overflow-hidden">
     <div class="row">
-      <BarraNavegacion @cerrarSesion="cerrarSesion" />
+      <BarraNavegacion @cerrarSesion="cerrarSesion" v-bind:itemsCarrito="this.productosCarrito" />
     </div>
     <div class="row">
       <div class="col-12 d-flex align-items-center justify-content-between">
@@ -20,7 +20,8 @@
       </div>
     </div>
     <div class="row">
-      <CatalogoPasteles class="col-12" v-if="mostrarCatalogo" :key="updateKey" :productos="productosFiltrados" />
+      <CatalogoPasteles v-show="mostrarCatalogo" class="col-12" :key="updateKey" :productos="productosFiltrados"
+        @agregarProducto="agregarACarrito" />
     </div>
   </div>
 </template>
@@ -55,65 +56,9 @@ export default {
       mostrarCatalogo: false,
       updateKey: 0,
       productosFiltrados: [],
-      productos: [
-        {
-          nombre: "Zanahoria",
-          descripcion: "Descripcion ejemplo",
-          imagen: require("../../assets/Imagen3.png"),
-          precio: 800,
-        },
-        {
-          nombre: "Chocolate",
-          descripcion: "Descripcion ejemplo",
-          imagen: require("../../assets/Imagen4.png"),
-          precio: 801,
-        },
-        {
-          nombre: "Manzana",
-          descripcion: "Descripcion ejemplo",
-          imagen: require("../../assets/Imagen5.png"),
-          precio: 802
-        },
-        {
-          nombre: "Triple chocolate",
-          descripcion: "Descripcion ejemplo",
-          imagen: require("../../assets/Imagen6.png"),
-          precio: 803,
-        },
-        {
-          nombre: "Viruta blanca",
-          descripcion: "Descripcion ejemplo",
-          imagen: require("../../assets/Imagen7.png"),
-          precio: 804,
-        },
-        {
-          nombre: "Mármol",
-          descripcion: "Descripcion ejemplo",
-          imagen: require("../../assets/Imagen8.png"),
-          precio: 805
-        },
-        {
-          nombre: "Galleta",
-          descripcion: "Descripcion ejemplo",
-          imagen: require("../../assets/Imagen9.png"),
-          precio: 806
-        },
-        {
-          nombre: "Leche merengada",
-          descripcion: "Descripcion ejemplo",
-          imagen: require("../../assets/Imagen10.png"),
-          precio: 807,
-        },
-        { nombre: "Kinder", descripcion: "Descripcion ejemplo", imagen: require("../../assets/Imagen11.png"), precio: 808 },
-        { nombre: "Oreo", descripcion: "Descripcion ejemplo", imagen: require("../../assets/Imagen12.png"), precio: 809 },
-        {
-          nombre: "Selva negra",
-          descripcion: "Descripcion ejemplo",
-          imagen: require("../../assets/Imagen13.png"),
-          precio: 810,
-        },
-      ],
+      productos: [],
       tipo: "",
+      productosCarrito: [],
     }
   },
   methods: {
@@ -245,10 +190,6 @@ export default {
         return formValues;
       }
     },
-
-
-
-
     async confirmarPedido(cliente, infoProducto) {
       const idUsuario = localStorage.getItem("idUsuario");
       const datos = {
@@ -331,17 +272,6 @@ export default {
       }
       this.tipo = tipo;
     },
-    async cargarImagenes(productos) {
-      await productos.forEach(async producto => {
-        producto.imagen = await this.obtenerArchivoImagen(producto);
-        this.productos.push(producto);
-      });
-
-      this.productosFiltrados = this.productos;
-      this.updateKey += 1;
-      this.$forceUpdate();
-      this.mostrarCatalogo = true;
-    },
     async obtenerArchivoImagen(producto) {
       const url = `${apiArchivos.obtener}?ruta=${producto.imagen}`;
       console.log(url);
@@ -388,10 +318,9 @@ export default {
         }, toastConf
       ).then((respuesta) => {
         if (respuesta.status === 200) {
-          console.log(respuesta.data)
-          this.cargarImagenes(respuesta.data);
-          this.productos = [];
+          this.productos = respuesta.data;
           this.productosFiltrados = this.productos;
+          this.mostrarCatalogo = true;
         }
       }).catch((error) => {
         if (error.response) {
@@ -461,10 +390,19 @@ export default {
         });
       }
     },
+    agregarACarrito(nuevoItem) {
+        const existente = this.productosCarrito.find(item => item.producto.id === nuevoItem.producto.id);
+        if (existente) {
+          existente.cantidad++;
+        } else {
+          this.productosCarrito = [...this.productosCarrito,nuevoItem]
+          console.log(this.productosCarrito);
+        }
+      }
   },
   mounted() {
-    this.definirTipo().then(() => {
-      this.consultarProductos();
+    this.definirTipo().then(async () => {
+      await this.consultarProductos();
     });
   }
 };
