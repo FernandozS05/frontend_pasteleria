@@ -73,9 +73,13 @@
           <button class="btn btn-danger" role="button" :disabled="!modificacion_autorizada" @click="modificarEntrega">
             Modificar Entrega
           </button>
-          <button v-if="this.detalles.estado == 'Liquidado'" class="btn btn-primary" role="button"
+          <button v-if="this.detalles.estado == 'Liquidado' && this.tipo == 'empresa'" class="btn btn-primary" role="button"
             @click="entregarPedido">
             Marcar entregado
+          </button>
+          <button v-if="this.tipo == 'empresa'" class="btn btn-primary" role="button"
+            :disabled="!puedeMoverAInventario" @click="moverAInventario">
+            Mover a inventario
           </button>
           <button class="btn btn-danger" role="button" :disabled="!autorizado" @click="cancelar">
             Cancelar Pedido
@@ -104,7 +108,21 @@ export default {
     return {
       autorizado: false,
       modificacion_autorizada: false,
+      tipo: ""
     };
+  },
+  computed: {
+    puedeMoverAInventario() {
+      if (this.detalles.estado === 'Cancelado') {
+        return true;
+      }
+
+      const fechaEntrega = new Date(this.entrega.fecha_entrega);
+      const hoy = new Date();
+      const diasPasados = (hoy - fechaEntrega) / (1000 * 60 * 60 * 24);
+
+      return diasPasados > 2;
+    }
   },
   methods: {
     async consultarCancelacion() {
@@ -122,13 +140,58 @@ export default {
           this.autorizado = false; 
         });
     },
+    async moverAInventario() {
+      try {
+        const resultado = await Swal.fire({
+          title: "¿Estás seguro de mover al inventario este pedido?",
+          text: "Esta acción no se puede revertir.",
+          icon: "info",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sí",
+          cancelButtonText: "No",
+        });
+
+        if (resultado.isConfirmed) {
+          Swal.fire({
+            title: 'Realizando cambios...',
+            text: 'Por favor, espere.',
+            didOpen: () => {
+              Swal.showLoading();
+            },
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false
+          });
+
+          const url = "/pedidos/mover-inventario/" + this.detalles.id;
+          const respuesta = await axios.put(url);
+
+          Swal.close();
+          if (respuesta.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Pedido actualizado correctamente.",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+
+            this.$router.push('/pedidos');
+          }
+        }
+      } catch (e) {
+        Swal.close();
+        this.manejarError(e);
+      }
+    },
     async modificarEntrega() {
       localStorage.setItem("idPedido", this.detalles.id);
       this.$router.push('/modificar-entrega');
     },
     async entregarPedido() {
       try {
-
         const resultado = await Swal.fire({
           title: "¿Estás seguro de marcar como entregado el pedido?",
           text: "Esta acción no se puede revertir.",
@@ -140,28 +203,27 @@ export default {
           cancelButtonText: "No",
         });
 
-        Swal.fire({
-          title: 'Realizando cambios...',
-          text: 'Por favor, espere.',
-          didOpen: () => {
-            Swal.showLoading();
-          },
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          allowEnterKey: false
-        });
-
         if (resultado.isConfirmed) {
+          Swal.fire({
+            title: 'Realizando cambios...',
+            text: 'Por favor, espere.',
+            didOpen: () => {
+              Swal.showLoading();
+            },
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false
+          });
 
           const url = apiCliente.entregarPedido + this.detalles.id;
-
           const respuesta = await axios.put(url);
+
           Swal.close();
           if (respuesta.status === 200) {
             Swal.fire({
               position: "center",
               icon: "success",
-              title: "Pedido cancelado correctamente.",
+              title: "Pedido entregado correctamente.",
               showConfirmButton: false,
               timer: 1500,
             });
@@ -177,10 +239,8 @@ export default {
     async consultarModificacion() {
       try {
         const url = apiCliente.consultarModificacion + this.detalles.id;
-
         const respuesta = await axios.get(url);
         if (respuesta.status === 200) {
-          console.log("Cancelable")
           this.modificacion_autorizada = respuesta.data.permitir;
         }
       } catch (e) {
@@ -254,7 +314,7 @@ export default {
         return `<div>
                 <p><strong>Nombre:</strong> ${producto.nombre}</p>
                 <p><strong>Descripción:</strong> ${producto.descripcion || 'No disponible'}</p>
-                <p><strong>Cantidad:</strong> ${producto.cantidad}</p>
+                <p><strong>Cantidad:</s+trong> ${producto.cantidad}</p>
                 <p><strong>Precio:</strong> $${parseInt(producto.precio).toFixed(2)}</p>
               </div><hr>`;
       }).join('');
@@ -304,6 +364,15 @@ export default {
           text: "Error desconocido.",
         });
       }
+    },
+    async definirTipo() {
+      const tipo = localStorage.getItem("tipoUsuario");
+
+      if (!tipo) {
+        this.$router.push("/login");
+        return;
+      }
+      this.tipo = tipo;
     },
     volver() {
       this.$router.back();
@@ -373,4 +442,3 @@ h4, .fs-4, .fs-5 {
   border-color: #fe8092;
 }
 </style>
-

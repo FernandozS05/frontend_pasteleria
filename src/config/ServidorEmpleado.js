@@ -33,6 +33,7 @@ const apiEmpleado = {
   asignarEntrega: ruta + "/pedidos/",
   consultarCancelacion: ruta + "/pedidos/consultar-cancelacion/",
   cancelarPedido: ruta + "/pedidos/cancelar-pedido/",
+  moverInventario: ruta + "/mover-inventario/",
   //Pagos
   generarPago: ruta + "/pedidos/pagos/generar-formato",
   registrarPago: ruta + "/pagos/registrar-pago/",
