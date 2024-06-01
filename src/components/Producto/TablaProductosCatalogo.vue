@@ -100,7 +100,7 @@
           const contentHtml = `
         <div >
           <p class="description">${producto.descripcion}</p>
-          <p class="description">Horas de trabajo: ${producto.horas_trabajo} horas.</p>
+          <p class="description">Horas de trabajo: ${producto.horas_trabajo} </p>
           <p class="description">$${producto.precio}</p>
         </div>
       `;

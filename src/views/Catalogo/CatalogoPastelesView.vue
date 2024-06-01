@@ -349,7 +349,6 @@ export default {
       this.$router.push("/login")
     },
     filtrarProductos(texto) {
-      // Filtrar las noticias por título
       this.productosFiltrados = this.productos.filter(producto =>
         producto.nombre.toLowerCase().includes(texto.toLowerCase())
       );

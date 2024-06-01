@@ -17,6 +17,7 @@
     "html2pdf.js": "^0.10.1",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
+    "moment-timezone": "^0.5.45",
     "sweetalert2": "^11.10.7",
     "toastify-js": "^1.12.0",
     "vue": "^3.2.13",
