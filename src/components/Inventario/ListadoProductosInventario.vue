@@ -71,9 +71,14 @@ export default {
         this.productosFiltrados = this.productos;
       }
     },
-    agregarAlCarrito(producto) {
-      this.productosCarrito.push(producto);
-      console.log(this.productosCarrito);
+    agregarAlCarrito(nuevoItem) {
+      const existente = this.productosCarrito.find(item => item.producto.id === nuevoItem.producto.id);
+        if (existente) {
+          existente.cantidad++;
+        } else {
+          this.productosCarrito = [...this.productosCarrito,nuevoItem]
+          console.log(this.productosCarrito);
+        }
     },
     nuevoProducto() {
       localStorage.setItem("ubicacionProducto", "inventario");

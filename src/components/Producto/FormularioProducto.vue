@@ -100,6 +100,7 @@
   </div>
 </template>
 
+
 <script>
 import apiEmpleado from "@/config/ServidorEmpleado";
 import axios from "@/config/axios.js";
@@ -139,16 +140,17 @@ export default {
         .then((response) => {
           if (response.status === 200) {
             Swal.close();
-            console.log(response.data);
-            this.nombre = response.data.nombre;
-            this.precio = parseInt(response.data.precio);
-            this.piezas = response.data.piezas;
-            this.descripcion = response.data.descripcion;
-            this.horas_trabajo = response.data.horas_trabajo;
+            const producto = response.data;
+            console.log(producto);
+            this.nombre = producto.nombre;
+            this.precio = parseInt(producto.precio);
+            this.piezas = producto.piezas;
+            this.descripcion = producto.descripcion;
+            this.horas_trabajo = producto.horas_trabajo;
 
-            this.fecha_caducidad = response.data.fecha_caducidad || "";
+            this.fecha_caducidad = producto.fecha_caducidad ? new Date(producto.fecha_caducidad).toISOString().split('T')[0] : "";
             console.log("Fecha de caducidad:", this.fecha_caducidad);
-            this.cantidad = parseInt(response.data.cantidad) || 0;
+            this.cantidad = parseInt(producto.cantidad) || 0;
             console.log("Cantidad:", this.cantidad);
           }
         })
@@ -182,8 +184,7 @@ export default {
       } else {
         Swal.fire({
           icon: "error",
-          title: "Error...",
-          text: "Error desconocido",
+          title: "Error desconocido",
         });
       }
     },
@@ -374,6 +375,7 @@ export default {
     this.ubicacion = localStorage.getItem("ubicacionProducto");
   },
 };
+
 </script>
 
 <style scoped>

@@ -38,8 +38,8 @@
               <p class="fs-5 link">Ventas</p>
             </router-link>
           </li>
-          <li class="nav-item">
-            <CarritoCompras v-bind:itemsCarrito="this.itemsCarrito" />
+          <li v-if="esCatalogo" class="nav-item">
+            <CarritoCompras :itemsCarrito="itemsCarrito" />
           </li>
         </ul>
       </nav>
@@ -47,10 +47,13 @@
   </div>
 </template>
 
+
+
 <script>
 import apiEmpleado from '@/config/ServidorEmpleado.js';
 import axios from '@/config/axios.js';
 import CarritoCompras from '../Carrito/CarritoCompras.vue';
+
 export default {
   name: "BarraNavegacion",
   props: {
@@ -76,6 +79,9 @@ export default {
     tipoUsuarioEsEmpresa() {
       return localStorage.getItem("tipoUsuario") === "empresa";
     },
+    esCatalogo() {
+      return this.$route.path === "/catalogo";
+    }
   },
   methods: {
     cerrarSesion() {
@@ -96,7 +102,6 @@ export default {
         const respuesta = await axios.get(url);
         console.log(respuesta);
         if (respuesta.status == 200) {
-
           this.esAdministrador = respuesta.data.administrador;
         }
       } catch (error) {
@@ -117,11 +122,12 @@ export default {
     this.revisarAdministrador();
   },
   watch: {
-  itemsCarrito(newVal) {
-    console.log('productosCarrito changed:', newVal);
+    itemsCarrito(newVal) {
+      console.log('productosCarrito changed:', newVal);
+    }
   }
-}
 };
+
 </script>
 
 <style scoped>

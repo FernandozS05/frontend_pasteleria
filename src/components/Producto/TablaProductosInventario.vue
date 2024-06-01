@@ -107,7 +107,7 @@ export default {
           title: producto.nombre,
           html: `
             <div>
-              <img src="${urlImagen}" alt="Imagen del Producto" style="width: 100%; height: auto; margin-bottom: 15px;">
+              <img src="${urlImagen}" alt="Imagen del Producto" style="width: 100px; height: 80px; margin-bottom: 15px;">
               <p class="description">${producto.descripcion}</p>
               <p class="price"><strong>Precio:</strong> $${producto.precio}</p>
               <label for="cantidad">Cantidad:</label>
@@ -128,7 +128,7 @@ export default {
         });
 
         if (cantidad) {
-          this.$emit("agregarCarrito", { ...producto, cantidad: parseInt(cantidad) });
+          this.$emit("agregarCarrito", { producto, cantidad: parseInt(cantidad) });
           Swal.fire({
             icon: "success",
             title: "Producto agregado al carrito",
