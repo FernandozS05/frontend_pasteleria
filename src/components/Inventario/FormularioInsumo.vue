@@ -129,7 +129,6 @@ export default {
         Swal.fire({
           title: "¿Quieres guardar los cambios?",
           showDenyButton: true,
-          showCancelButton: true,
           confirmButtonText: "Guardar",
           denyButtonText: "No guardar"
         }).then((result) => {

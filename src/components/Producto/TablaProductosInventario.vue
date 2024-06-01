@@ -286,7 +286,6 @@ export default {
       }
     },
     async generarFactura(datos) {
-
       try {
         const url = apiCliente.generarFactura;
         console.log(url);
