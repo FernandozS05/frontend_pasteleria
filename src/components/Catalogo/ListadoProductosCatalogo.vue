@@ -56,12 +56,20 @@ export default {
       this.$router.push("/catalogo");
     },
     filtrarProductosTexto(textoDeBusqueda) {
+      
       if (textoDeBusqueda) {
         this.productosFiltrados = this.productos.filter(insumo =>
           insumo.nombre.toLowerCase().includes(textoDeBusqueda.toLowerCase())
         );
       } else {
         this.productosFiltrados = this.productos;
+      }
+      if(!this.productosFiltrados.length > 0) {
+        Swal.fire({
+            icon: "info",
+            title: "No encontrados",
+            text: "No hay ningun producto.",
+          });
       }
     },
     nuevoProducto() {
@@ -120,6 +128,7 @@ export default {
           console.log(response.data)
           this.productos = response.data;
           this.productosFiltrados = this.productos;
+          
         }
       }).catch(error => {
         Swal.close();

@@ -24,29 +24,29 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(producto, index) in productos" :key="index">
-          <td>
+        <tr v-for="(producto, index) in productos" :key="index" >
+          <td :class="caducidadClass(producto)">
             <p class="fs-5 align-self-start" :title="producto.nombre">
               {{ producto.nombre }}
             </p>
-          </td>
-          <td>
+          </td >
+          <td :class="caducidadClass(producto)">
             <p class="fs-5">{{ `$${producto.precio}` }}</p>
           </td>
-          <td>
+          <td :class="caducidadClass(producto)">
             <p class="fs-5">{{ producto.cantidad }}</p>
           </td>
-          <td>
+          <td :class="caducidadClass(producto)">
             <button type="button" class="btn btn-primary btn-sm" @click="verInfoProducto(producto)">
               Ver
             </button>
           </td>
-          <td>
+          <td :class="caducidadClass(producto)">
             <button type="button" class="btn btn-primary btn-sm" @click="editarProducto(producto.id)">
               Editar
             </button>
           </td>
-          <td>
+          <td :class="caducidadClass(producto)">
             <button type="button" class="btn btn-danger btn-sm" @click="eliminarProducto(producto.id)">
               Eliminar
             </button>
@@ -57,11 +57,12 @@
   </div>
 </template>
 
-
 <script>
 import apiArchivos from "@/config/ServidorArchivos";
 import axios from "@/config/axios.js";
 import Swal from "sweetalert2";
+
+const imgDefault = require("../../assets/pastel_default.png"); // Asegúrate de tener una imagen por defecto en tu directorio de assets
 
 export default {
   name: "TablaProducto",
@@ -70,6 +71,14 @@ export default {
       type: Array,
       default: () => [],
     },
+  },
+  data() {
+    return {
+      productosProximosCaducar: [],
+      productosCaducados: []
+    };
+  },
+  mounted() {
   },
   methods: {
     editarProducto(idProducto) {
@@ -98,11 +107,11 @@ export default {
       } catch (error) {
         console.log(error);
       }
-      return null;
+      return imgDefault; // Retorna la imagen por defecto en caso de error
     },
     async verInfoProducto(producto) {
       try {
-        const urlImagen = await this.obtenerImagen(producto.imagen);
+        const urlImagen = producto.imagen ? await this.obtenerImagen(producto.imagen) : imgDefault;
         const { value: cantidad } = await Swal.fire({
           title: producto.nombre,
           html: `
@@ -128,6 +137,7 @@ export default {
         });
 
         if (cantidad) {
+          //this.actualizarCantidadProducto(producto, parseInt(cantidad));
           this.$emit("agregarCarrito", { producto, cantidad: parseInt(cantidad) });
           Swal.fire({
             icon: "success",
@@ -145,7 +155,29 @@ export default {
         });
       }
     },
-  },
+    actualizarCantidadProducto(producto, cantidadAgregada) {
+      producto.cantidad -= cantidadAgregada;
+      if (producto.cantidad === 0) {
+        const index = this.productos.findIndex(p => p.id === producto.id);
+        if (index !== -1) {
+          // eslint-disable-next-line vue/no-mutating-props
+          this.productos.splice(index, 1);
+        }
+      }
+    },
+    caducidadClass(producto) {
+      const hoy = new Date();
+      const fechaCaducidad = new Date(producto.fecha_caducidad);
+      const diferenciaDias = (fechaCaducidad - hoy) / (1000 * 60 * 60 * 24);
+
+      if (diferenciaDias <= 2 && diferenciaDias > 0) {
+        return 'proximo-caducar';
+      } else if (diferenciaDias <= 0) {
+        return 'caducado';
+      }
+      return '';
+    }
+  }
 };
 </script>
 
@@ -194,5 +226,13 @@ tbody td {
 
 .description {
   margin-bottom: 15px;
+}
+
+.proximo-caducar {
+  background-color: rgb(252, 252, 151) !important;
+}
+
+.caducado {
+  background-color: rgb(252, 176, 176) !important;
 }
 </style>

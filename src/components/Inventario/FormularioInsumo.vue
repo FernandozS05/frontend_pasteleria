@@ -23,7 +23,7 @@
           <button type="button" class="btn btn-outline-secondary me-md-2" @click="cancelar">
             Cancelar
           </button>
-          <button type="submit" class="btn btn-rose">Registrar</button>
+          <button type="submit" class="btn btn-rose">Guardar</button>
         </div>
       </form>
     </div>

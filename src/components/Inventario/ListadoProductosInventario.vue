@@ -5,31 +5,25 @@
       </div>
       <div class="row">
         <div class="col container pt-2 bg-light shadow m-3 rounded border border-dark">
-          <div class="row  align-items-start">
-            <p class="col-6 fs-4  text-nowrap fw-medium subtitulo">
+          <div class="row align-items-start">
+            <p class="col-6 fs-4 text-nowrap fw-medium subtitulo">
               Productos en el inventario
             </p>
             <div class="row d-flex">
-              <BarraBusqueda class="col-5 ms-2 align-items-center" :placeholder="Buscar"
-                @filtrar="filtrarProductosTexto" />
+              <BarraBusqueda class="col-5 ms-2 align-items-center" :placeholder="Buscar" @filtrar="filtrarProductosTexto" />
               <button type="button" class="btn btn-success boton-agregar ms-3 col-2" @click="nuevoProducto">
                 Agregar
               </button>
-              <button type="button"
-                class="col-2 btn btn-success boton-agregar ms-3 d-flex align-items-center justify-content-evenly text-center p-1 boton-hover text-nowrap"
-                @click="verInsumos">
+              <button type="button" class="col-2 btn btn-success boton-agregar ms-3 d-flex align-items-center justify-content-evenly text-center p-1 boton-hover text-nowrap" @click="verInsumos">
                 Ver insumos
               </button>
               <div class="col-1 ms-5">
-                <CarritoComprasInventario v-bind:itemsCarrito="this.productosCarrito" />
+                <CarritoComprasInventario :itemsCarrito="productosCarrito" @eliminarDelCarrito="eliminarDelCarrito" />
               </div>
             </div>
-
           </div>
           <div class="row p-3">
-            <TablaProductosInventario class="col-12 border border-3 rounded" :productos="productosFiltrados"
-              @agregarCarrito="agregarAlCarrito" @editarProducto="editarProducto"
-              @eliminarProducto="eliminarProducto" />
+            <TablaProductosInventario class="col-12 border border-3 rounded" :productos="productosFiltrados" @agregarCarrito="agregarAlCarrito" @editarProducto="editarProducto" @eliminarProducto="eliminarProducto" />
           </div>
         </div>
       </div>
@@ -44,6 +38,7 @@ import apiEmpleado from "@/config/ServidorEmpleado";
 import axios from "@/config/axios.js";
 import Swal from 'sweetalert2';
 import CarritoComprasInventario from "../Carrito/CarritoComprasInventario.vue";
+
 export default {
   name: "ListadoInsumo",
   components: {
@@ -56,6 +51,8 @@ export default {
       productos: [],
       productosFiltrados: [],
       productosCarrito: [],
+      productosProximosCaducar: [],
+      productosCaducados: []
     };
   },
   methods: {
@@ -70,15 +67,32 @@ export default {
       } else {
         this.productosFiltrados = this.productos;
       }
+
+      if(!this.productosFiltrados.length > 0) {
+        Swal.fire({
+            icon: "info",
+            title: "No encontrados",
+            text: "No hay ningun producto.",
+          });
+      }
     },
     agregarAlCarrito(nuevoItem) {
       const existente = this.productosCarrito.find(item => item.producto.id === nuevoItem.producto.id);
-        if (existente) {
-          existente.cantidad++;
-        } else {
-          this.productosCarrito = [...this.productosCarrito,nuevoItem]
-          console.log(this.productosCarrito);
-        }
+      if (existente) {
+        existente.cantidad++;
+      } else {
+        this.productosCarrito = [...this.productosCarrito, nuevoItem];
+      }
+      this.actualizarCantidadProducto(nuevoItem.producto, -nuevoItem.cantidad);
+    },
+    eliminarDelCarrito(itemCarrito) {
+      const index = this.productosCarrito.findIndex(item => item.producto.id == itemCarrito.producto.id);
+      if (index !== -1) {
+        const producto = this.productosCarrito[index].producto;
+        const cantidad = this.productosCarrito[index].cantidad;
+        this.productosCarrito.splice(index, 1);
+        this.actualizarCantidadProducto(producto, cantidad);
+      }
     },
     nuevoProducto() {
       localStorage.setItem("ubicacionProducto", "inventario");
@@ -133,9 +147,9 @@ export default {
       axios.get(url).then(response => {
         if (response.status === 200) {
           Swal.close();
-          console.log(response.data)
           this.productos = response.data;
           this.productosFiltrados = this.productos;
+          this.verificarCaducidadProductos();
         }
       }).catch(error => {
         Swal.close();
@@ -145,25 +159,73 @@ export default {
             title: "No se encontraron elementos...",
             text: "Parece que no hay ningún producto en el inventario.",
           });
-        }
-        else if (error.request) {
+        } else if (error.request) {
           Swal.fire({
             icon: "error",
             title: "Error...",
-            text: ("Error de red"),
+            text: "Error de red",
           });
         } else {
           Swal.fire({
             icon: "error",
             title: "Error...",
-            text: ("Error desconocido"),
+            text: "Error desconocido",
           });
         }
       });
     },
+    actualizarCantidadProducto(producto, cantidad) {
+      const prod = this.productos.find(p => p.id == producto.id);
+      if (prod) {
+        prod.cantidad += cantidad;
+        if (prod.cantidad < 0) prod.cantidad = 0;
+      } else {
+        producto.cantidad = cantidad;
+        this.productos.push(producto);
+      }
+      if (producto.cantidad === 0) {
+        const index = this.productos.findIndex(p => p.id === producto.id);
+        if (index !== -1) {
+          // eslint-disable-next-line vue/no-mutating-props
+          this.productos.splice(index, 1);
+        }
+      }
+      this.filtrarProductosTexto(''); // Refresca la lista de productos filtrados
+    },
+    verificarCaducidadProductos() {
+      const hoy = new Date();
+      this.productosProximosCaducar = [];
+      this.productosCaducados = [];
+
+      this.productosFiltrados.forEach(producto => {
+        const fechaCaducidad = new Date(producto.fecha_caducidad);
+        const diferenciaDias = (fechaCaducidad - hoy) / (1000 * 60 * 60 * 24);
+
+        if (diferenciaDias <= 2 && diferenciaDias > 0) {
+          this.productosProximosCaducar.push(producto);
+        } else if (diferenciaDias <= 0) {
+          this.productosCaducados.push(producto);
+        }
+      });
+
+      if (this.productosProximosCaducar.length > 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "Atención",
+          text: "Algunos productos están próximos a caducar.",
+        });
+      }
+
+      if (this.productosCaducados.length > 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Atención",
+          text: "Algunos productos están caducados.",
+        });
+      }
+    },
     manejarError(error) {
       if (error.response) {
-
         Swal.fire({
           icon: "error",
           title: "Error...",
@@ -175,23 +237,22 @@ export default {
             title: "No autorizado...",
             text: "Por favor, inicie sesión nuevamente.",
           });
-          this.$router.push("/login")
+          this.$router.push("/login");
         }
       } else if (error.request) {
         Swal.fire({
           icon: "error",
           title: "Error...",
-          text: ("Error de red"),
+          text: "Error de red",
         });
       } else {
         Swal.fire({
           icon: "error",
           title: "Error...",
-          text: ("Error desconocido"),
+          text: "Error desconocido",
         });
       }
     }
-
   },
   async mounted() {
     localStorage.removeItem("idProducto");

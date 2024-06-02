@@ -321,6 +321,13 @@ export default {
           this.productos = respuesta.data;
           this.productosFiltrados = this.productos;
           this.mostrarCatalogo = true;
+          if (!this.productosFiltrados.length > 0) {
+            Swal.fire({
+              icon: "info",
+              title: "No encontrados",
+              text: "No hay ningun producto.",
+            });
+          }
         }
       }).catch((error) => {
         if (error.response) {
@@ -352,6 +359,14 @@ export default {
       this.productosFiltrados = this.productos.filter(producto =>
         producto.nombre.toLowerCase().includes(texto.toLowerCase())
       );
+
+      if (!this.productosFiltrados.length > 0) {
+        Swal.fire({
+          icon: "info",
+          title: "No encontrados",
+          text: "No hay ningun producto.",
+        });
+      }
     },
     manejarError(error) {
       if (error.response) {
@@ -390,14 +405,14 @@ export default {
       }
     },
     agregarACarrito(nuevoItem) {
-        const existente = this.productosCarrito.find(item => item.producto.id === nuevoItem.producto.id);
-        if (existente) {
-          existente.cantidad++;
-        } else {
-          this.productosCarrito = [...this.productosCarrito,nuevoItem]
-          console.log(this.productosCarrito);
-        }
+      const existente = this.productosCarrito.find(item => item.producto.id === nuevoItem.producto.id);
+      if (existente) {
+        existente.cantidad++;
+      } else {
+        this.productosCarrito = [...this.productosCarrito, nuevoItem]
+        console.log(this.productosCarrito);
       }
+    }
   },
   mounted() {
     this.definirTipo().then(async () => {

@@ -36,6 +36,7 @@ import TablaInsumo from "../Inventario/TablaInsumo.vue";
 import apiEmpleado from "@/config/ServidorEmpleado";
 import axios from "@/config/axios.js";
 import Swal from 'sweetalert2';
+
 export default {
   name: "ListadoInsumo",
   components: {
@@ -80,9 +81,8 @@ export default {
           confirmButtonColor: '#fe8092'
         });
 
-        // Verificar si el usuario confirmó y si se ingresó un valor.
         if (result.isConfirmed && result.value !== null) {
-          const nuevasPiezas = result.value;  // Directamente usar el valor aquí.
+          const nuevasPiezas = result.value;
           await this.actualizarPiezasInsumo(insumo.id, nuevasPiezas);
         }
       } catch (error) {
@@ -93,14 +93,11 @@ export default {
           'error'
         );
       }
-    }
-    ,
+    },
 
-    // Este método actualiza las piezas de un insumo en el servidor.
     async actualizarPiezasInsumo(idInsumo, nuevasPiezas) {
       const url = `${apiEmpleado.actualizarInsumoInventario}${idInsumo}`;
       try {
-
         Swal.fire({
           title: 'Realizando cambios...',
           text: 'Por favor, espere.',
@@ -186,6 +183,7 @@ export default {
           Swal.close();
           this.insumos = response.data;
           this.insumosFiltrados = this.insumos;
+          this.verificarCaducidad();
         }
       }).catch(error => {
         Swal.close();
@@ -211,9 +209,32 @@ export default {
         }
       });
     },
+    async verificarCaducidad() {
+      const hoy = new Date();
+      const dosDiasDespues = new Date(hoy);
+      dosDiasDespues.setDate(hoy.getDate() + 2);
+
+      const caducados = this.insumos.filter(insumo => new Date(insumo.fecha_caducidad) < hoy);
+      const porCaducar = this.insumos.filter(insumo => new Date(insumo.fecha_caducidad) >= hoy && new Date(insumo.fecha_caducidad) <= dosDiasDespues);
+
+      if (caducados.length > 0) {
+        await Swal.fire({
+          icon: 'warning',
+          title: 'Productos caducados',
+          text: `Hay ${caducados.length} insumo(s) que ya han caducado.`,
+        });
+      }
+
+      if (porCaducar.length > 0) {
+        await Swal.fire({
+          icon: 'info',
+          title: 'Productos por caducar',
+          text: `Hay ${porCaducar.length} insumo(s) que caducarán en los próximos 2 días.`,
+        });
+      }
+    },
     manejarError(error) {
       if (error.response) {
-
         Swal.fire({
           icon: "error",
           title: "Error...",
@@ -241,7 +262,6 @@ export default {
         });
       }
     }
-
   },
   async mounted() {
     localStorage.removeItem("idInsumo");

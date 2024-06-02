@@ -23,7 +23,7 @@
           <p class="fs-6">
             {{
               `Entrega a partir de las : ${this.entrega.hora
-                ? this.entrega.hora
+                ? `${this.entrega.hora}:00 hrs`
                 : "No disponible"
               }`
             }}
@@ -113,6 +113,9 @@ export default {
   },
   computed: {
     puedeMoverAInventario() {
+      if(this.detalles.estado === "Entregado" || this.detalles.estado === "No entregado"){
+        return false
+      }
       if (this.detalles.estado === 'Cancelado') {
         return true;
       }
@@ -165,7 +168,7 @@ export default {
             allowEnterKey: false
           });
 
-          const url = "/pedidos/mover-inventario/" + this.detalles.id;
+          const url = "/empleado/pedidos/mover-inventario/" + this.detalles.id;
           const respuesta = await axios.put(url);
 
           Swal.close();
@@ -385,6 +388,7 @@ export default {
     },
   },
   async mounted() {
+    await this.definirTipo();
     await this.consultarCancelacion();
     await this.consultarModificacion();
   },

@@ -102,6 +102,13 @@ export default {
         });
     },
     registrarPago() {
+      if(this.folio == ""){
+        Swal.fire({
+            icon: "info",
+            title: "Ingrese el folio",
+            text: "Debe ingresar el folio del pago realizado",
+          });
+      }
       let anticipado = false;
       if (this.pedido.id_anticipo != null) {
         anticipado = true;
@@ -138,7 +145,7 @@ export default {
             const a = document.createElement("a");
 
             a.href = url;
-            a.download = "nombre-del-archivo.pdf";
+            a.download = "Recibo de pago.pdf";
 
             document.body.appendChild(a);
             a.click();
@@ -162,7 +169,9 @@ export default {
         });
     },
     manejarError(error) {
+      
       if (error.response) {
+        console.log(error.response)
         if (error.response.status === 401) {
           this.$router.push("/login");
           Swal.fire({
@@ -174,13 +183,21 @@ export default {
           Swal.fire({
             icon: "error",
             title: "Error...",
-            text: "Información no encontrada.",
+            text: "Folio no encontrado",
           });
-        } else {
+        }
+        else if (error.response.status === 400) {
           Swal.fire({
             icon: "error",
             title: "Error...",
-            text: "Error en la solicitud.",
+            text: "El folio ha expirado o ya fue ocupado en otra ocasion",
+          });
+        } else {
+          
+          Swal.fire({
+            icon: "error",
+            title: "Error...",
+            text: "Folio no valido",
           });
         }
       } else if (error.request) {
