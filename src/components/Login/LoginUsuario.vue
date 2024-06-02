@@ -19,7 +19,7 @@
 
           <form @submit.prevent="iniciarSesion">
             <div class="mb-3">
-              <label for="correo" class="form-label">Correo</label>
+              <label for="correo" class="form-label">Correo o Nombre de Usuario</label>
               <input v-model="usuario" class="form-control" id="correo" placeholder="Ingrese su correo" />
             </div>
 
