@@ -108,7 +108,7 @@ export default {
         const respuesta = await axios.get(url);
         console.log('Respuesta del servidor:', respuesta); // Log de depuración
         if (respuesta.status === 200) {
-          return respuesta.data.exists; // Asumiendo que el backend responde con un campo 'exists'
+          return respuesta.data.disponible; // Asumiendo que el backend responde con un campo 'exists'
         } else {
           return false;
         }
@@ -139,9 +139,9 @@ export default {
       const descripcionRegex = /^[A-Za-z0-9\s.,éáíóúñüÉÁÍÓÚÑÜ]+$/;
       const precioHorasRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
       
-      const nombreExiste = await this.consultarNombre(this.nombre);
-      console.log(nombreExiste);
-      if (!nombreExiste && !this.editando) {
+      const nombreDisponible = await this.consultarNombre(this.nombre);
+
+      if (!nombreDisponible && !this.editando) {
         await Swal.fire(
           "Error",
           "El nombre del producto ya existe. Por favor, elija un nombre diferente.",
