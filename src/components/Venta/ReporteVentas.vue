@@ -453,7 +453,7 @@ export default {
 
       startY += 10;
       // Función para agregar ventas semanales
-      this.datos.ventarPorSemanas.forEach((semana, index) => {
+      this.datos.ventasPorSemanas.forEach((semana, index) => {
         let fechaInicioSemana = this.calcularInicioSemana(this.fechaDesde, index + 1);
         doc.text(`Ventas Semana ${index + 1} (Inicio: ${fechaInicioSemana})`, 14, startY + 10);
         const columnasVentasDias = ['Día', 'Total de Ventas ($)'];

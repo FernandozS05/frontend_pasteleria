@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://server-pasteleria.onrender.com/api', // Corregido, eliminadas las comillas dobles extras
+  baseURL: 'http://localhost:3000/api', // Corregido, eliminadas las comillas dobles extras
   withCredentials: true,
 });
 
