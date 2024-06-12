@@ -405,10 +405,13 @@ export default {
       }
     },
     agregarACarrito(nuevoItem) {
+      console.log(nuevoItem);
       const existente = this.productosCarrito.find(item => item.producto.id === nuevoItem.producto.id);
       if (existente) {
-        existente.cantidad++;
+        console.log(existente)
+        existente.cantidad = Number(existente.cantidad) + Number(nuevoItem.cantidad);
       } else {
+        nuevoItem.cantidad = Number(nuevoItem.cantidad); 
         this.productosCarrito = [...this.productosCarrito, nuevoItem]
         console.log(this.productosCarrito);
       }

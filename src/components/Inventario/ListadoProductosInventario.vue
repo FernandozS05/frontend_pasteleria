@@ -77,9 +77,10 @@ export default {
       }
     },
     agregarAlCarrito(nuevoItem) {
+      console.log(nuevoItem);
       const existente = this.productosCarrito.find(item => item.producto.id === nuevoItem.producto.id);
       if (existente) {
-        existente.cantidad++;
+        existente.cantidad= parseInt(existente.cantidad) +parseInt(nuevoItem.cantidad);
       } else {
         this.productosCarrito = [...this.productosCarrito, nuevoItem];
       }

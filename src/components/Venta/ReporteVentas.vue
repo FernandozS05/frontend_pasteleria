@@ -210,14 +210,14 @@ export default {
           responsive: true
         }
       });
-
+      console.log()
       this.graficas.ventasPorSemana1 = new Chart(document.getElementById('ventasPorSemana1').getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: this.datos.ventarPorSemanas[0].labels.map(dia => dia),
+          labels: this.datos.ventasPorSemanas[0].labels.map(dia => dia),
           datasets: [{
             label: 'Ventas por la semana 1',
-            data: this.datos.ventarPorSemanas[0].data.map(item => item),
+            data: this.datos.ventasPorSemanas[0].data.map(item => item),
             borderWidth: 1
           }]
         },
@@ -237,14 +237,14 @@ export default {
         }
       });
 
-
+    
       this.graficas.ventasPorSemana2 = new Chart(document.getElementById('ventasPorSemana2').getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: this.datos.ventarPorSemanas[1].labels.map(dia => dia),
+          labels: this.datos.ventasPorSemanas[1].labels.map(dia => dia),
           datasets: [{
             label: 'Ventas por la semana 2',
-            data: this.datos.ventarPorSemanas[1].data.map(item => item),
+            data: this.datos.ventasPorSemanas[1].data.map(item => item),
             borderWidth: 1
           }]
         },
@@ -267,10 +267,10 @@ export default {
       this.graficas.ventasPorSemana3 = new Chart(document.getElementById('ventasPorSemana3').getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: this.datos.ventarPorSemanas[2].labels.map(item => item),
+          labels: this.datos.ventasPorSemanas[2].labels.map(item => item),
           datasets: [{
             label: 'Ventas por la semana 3',
-            data: this.datos.ventarPorSemanas[2].data.map(item => item),
+            data: this.datos.ventasPorSemanas[2].data.map(item => item),
             borderWidth: 1
           }]
         },
@@ -289,14 +289,14 @@ export default {
           responsive: true
         }
       });
-
+      
       this.graficas.ventasPorSemana4 = new Chart(document.getElementById('ventasPorSemana4').getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: this.datos.ventarPorSemanas[3].labels.map(item => item),
+          labels: this.datos.ventasPorSemanas[3].labels.map(item => item),
           datasets: [{
-            label: 'Ventas por la semana 3',
-            data: this.datos.ventarPorSemanas[3].data.map(item => item),
+            label: 'Ventas por la semana 4',
+            data: this.datos.ventasPorSemanas[3].data.map(item => item),
             borderWidth: 1
           }]
         },
@@ -315,7 +315,8 @@ export default {
           responsive: true
         }
       });
-
+    
+      console.log(this.datos.ventasPorTipoUltimoMes.map(item => item.tipo))
       this.graficas.ventasPorTipoMes = new Chart(document.getElementById('ventasPorTipoMes').getContext('2d'), {
         type: 'doughnut',
         data: {
