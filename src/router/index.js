@@ -78,9 +78,17 @@ const routes = [
     component: FormularioDireccionView
   },
   {
-    path: '/elementoPedido',
+    path: '/elementoPedido/:id',
     name: 'ElementoPedido',
-    component: ElementoPedidoView
+    component: ElementoPedidoView,
+    beforeEnter: (to, from, next) => {
+      const id = parseInt(to.params.id, 10);
+      if (isNaN(id)) {
+        next('/error'); // Redirigir a una página de error si el id no es válido
+      } else {
+        next();
+      }
+    }
   },
   {
     path: '/elementoVenta',

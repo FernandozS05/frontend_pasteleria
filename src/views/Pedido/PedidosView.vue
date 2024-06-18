@@ -148,8 +148,9 @@ export default {
     },
     verInformacion(index) {
       const idPedido = this.pedidos[index].id;
-      localStorage.setItem("idPedido", idPedido);
-      this.$router.push("/elementoPedido")
+      this.$router.push({ name: 'ElementoPedido', params: { id: idPedido } });
+      //localStorage.setItem("idPedido", idPedido);
+      //this.$router.push("/elementoPedido")
     },
     irAPago(index) {
       const idPedido = this.pedidos[index].id;

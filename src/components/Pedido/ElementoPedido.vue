@@ -241,6 +241,10 @@ export default {
     },
     async consultarModificacion() {
       try {
+        if(this.detalles.estado == 'Cancelado'){
+          this.modificacion_autorizada = false;
+          return
+        }
         const url = apiCliente.consultarModificacion + this.detalles.id;
         const respuesta = await axios.get(url);
         if (respuesta.status === 200) {
@@ -312,13 +316,16 @@ export default {
         }
       });
     },
+    formatMoneda(valor) {
+      return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(valor);
+    },
     verProductos(productos) {
       const htmlContent = productos.map(producto => {
         return `<div>
                 <p><strong>Nombre:</strong> ${producto.nombre}</p>
                 <p><strong>Descripción:</strong> ${producto.descripcion || 'No disponible'}</p>
                 <p><strong>Cantidad:</s+trong> ${producto.cantidad}</p>
-                <p><strong>Precio:</strong> $${parseInt(producto.precio).toFixed(2)}</p>
+                <p><strong>Total:</strong> $${this.formatMoneda(Number(producto.precio) * Number(producto.cantidad))}</p>
               </div><hr>`;
       }).join('');
 

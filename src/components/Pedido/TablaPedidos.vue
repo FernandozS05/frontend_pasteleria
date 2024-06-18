@@ -38,7 +38,7 @@
             <p class="fs-5">{{ obtenerFechaEntrega(pedido.id_entrega) }}</p>
           </td>
           <td class="ps-5" :class="getRowClass(pedido)">
-            <p v-if="pedido.id_liquidacion != null" class="fs-5">No disponible</p>
+            <p v-if="pedido.id_liquidacion != null || pedido.estado == 'Cancelado'" class="fs-5">No disponible</p>
             <button v-else type="button" class="btn btn-primary btn-sm" @click="pagar(index)">
               Pagar
             </button>
@@ -236,12 +236,6 @@ export default {
   background-color: #fff;
 }
 
-.table .thead-dark th {
-  color: #fff;
-  background-color: #343a40;
-  border-color: #454d55;
-}
-
 .table .thead-light th {
   color: #495057;
   background-color: #e9ecef;
@@ -250,20 +244,21 @@ export default {
 
 .bg-yellow {
   background-color: rgb(252, 252, 151) !important;
+  color: #495057 !important;
 }
 
 .bg-green {
   background-color: rgb(181, 255, 181) !important;
-  
+  color: #495057 !important;
 }
 
 .bg-red {
   background-color: rgb(255, 139, 139) !important;
-  
+  color: #495057 !important;
 }
 .bg-blue {
   background-color: rgb(168, 238, 255) !important;
-  
+  color: #495057 !important;
 }
 
 #app {

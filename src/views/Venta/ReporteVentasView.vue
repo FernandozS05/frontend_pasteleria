@@ -5,17 +5,22 @@
   <div class="row ms-4">
     <ReporteVentas v-bind:ventas="this.ventasFiltradas" />
   </div>
+  <div class="row ms-4">
+    <TablaVentas v-bind:ventas="this.ventasFiltradas" />
+  </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import BarraNavegacion from "@/components/Barras/BarraNavegacion.vue";
 import ReporteVentas from "@/components/Venta/ReporteVentas.vue";
+import TablaVentas from "@/components/Venta/TablaVentas.vue";
 export default {
   name: "ReporteVentasView",
   components: {
     ReporteVentas,
-    BarraNavegacion
+    BarraNavegacion,
+    TablaVentas
   },
   data() {
     return {

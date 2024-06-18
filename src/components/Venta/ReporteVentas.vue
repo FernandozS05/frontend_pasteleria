@@ -4,14 +4,13 @@
     <div class="row mt-3 border rounded border-4">
       <div class="row align-items-center my-3">
         <div class="col-3">
-          <p class="fs-4 fw-medium">Reporte de ventas</p>
+          <p class="fs-4 fw-medium">Resumen de ventas</p>
         </div>
         <div class="col-5 mt-1">
-          <p class="fs-5">{{ `Datos obtenidos anteriores al ${this.fechaDesdeActual ? this.fechaDesdeActual : " "} ` }}
-          </p>
+          <p class="fs-5">{{ `Datos obtenidos de ${encabezado}` }}</p>
         </div>
         <div class="col-4">
-          <button class="btn btn-primary btn-sm" @click="consultarFechas">Cambiar fecha referencia</button>
+          <button class="btn btn-primary btn-sm" @click="consultarFechas">Cambiar mes/año</button>
           <button class="btn btn-primary btn-sm ms-4" @click="descargarReporte">Descargar reporte</button>
         </div>
       </div>
@@ -25,27 +24,27 @@
           </div>
         </div>
         <div class="col-6 mt-3">
-          <h4>Ventas últimas 4 semanas</h4>
           <select class="form-control" v-model="graficaSemanaSeleccionada">
-            <option value="Semana1">Semana 1</option>
-            <option value="Semana2">Semana 2</option>
-            <option value="Semana3">Semana 3</option>
-            <option value="Semana4">Semana 4</option>
+            <option value="Semana1">{{ datos.ventasPorSemanas ? `Ventas semana ${datos.ventasPorSemanas[0].periodo}` :
+              "Sin datos" }}</option>
+            <option value="Semana2">{{ datos.ventasPorSemanas ? `Ventas semana ${datos.ventasPorSemanas[1].periodo}` :
+              "Sin datos" }}</option>
+            <option value="Semana3">{{ datos.ventasPorSemanas ? `Ventas semana ${datos.ventasPorSemanas[2].periodo}` :
+              "Sin datos" }}</option>
+            <option value="Semana4">{{ datos.ventasPorSemanas ? `Ventas semana ${datos.ventasPorSemanas[3].periodo}` :
+              "Sin datos" }}</option>
           </select>
           <div class="chart-container" v-show="graficaSemanaSeleccionada == 'Semana1'">
 
             <canvas id="ventasPorSemana1"></canvas>
           </div>
           <div class="chart-container" v-show="graficaSemanaSeleccionada == 'Semana2'">
-            <h4>Ventas Semana 2</h4>
             <canvas id="ventasPorSemana2"></canvas>
           </div>
           <div class="chart-container" v-show="graficaSemanaSeleccionada == 'Semana3'">
-            <h4>Ventas Semana 3</h4>
             <canvas id="ventasPorSemana3"></canvas>
           </div>
           <div class="chart-container" v-show="graficaSemanaSeleccionada == 'Semana4'">
-            <h4>Ventas Semana 4</h4>
             <canvas id="ventasPorSemana4"></canvas>
           </div>
         </div>
@@ -84,7 +83,7 @@ import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
 export default {
-  name: "TablaVentas",
+  name: "ReporteVentas",
   props: {
 
   },
@@ -92,12 +91,17 @@ export default {
 
   },
   data() {
+    const fechaActual = new Date();
+    const anioActual = fechaActual.getFullYear();
+    const mesActual = fechaActual.getMonth() + 1; // Los meses son 0-indexados en JavaScript
     return {
-      fechaDesdeActual: null,
-      fechaFinalActual: null,
-      fechaDesde: "2024-04-01",
-      fechaFinal: "2024-04-30",
+      meses: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+      mesActual: mesActual,
+      anioActual: anioActual, fechaDesdeActual: `${anioActual}-${mesActual}-01`,
+      mesSeleccionado: mesActual,
+      anioSeleccionado: anioActual,
       graficaSemanaSeleccionada: "Semana1",
+      encabezado: "",
       datos: {
       },
       graficas: {
@@ -144,25 +148,86 @@ export default {
       }
     }
     ,
-    async consultarFechas() {
-      if (await this.obtenerFechaGraficas()) {
-        this.consultarVentas();
-      }
-    },
     async consultarVentas() {
       try {
-        const url = apiEmpleado.consultarVentas + `?fechaDesde=${moment(this.fechaDesde).format('YYYY-MM-DD')}`;
-        console.log(url);
+        // Validar que mes y año estén seleccionados
+        if (!this.mesSeleccionado || !this.anioSeleccionado) {
+          Swal.fire('Error', 'Por favor seleccione un mes y un año', 'error');
+          return;
+        }
+        const mes = this.mesSeleccionado || new Date().getMonth() + 1;
+        const anio = this.anioSeleccionado || new Date().getFullYear();
+
+        const url = `${apiEmpleado.consultarVentas}?mes=${mes}&anio=${anio}`;
+
+        Swal.fire({
+          title: 'Consultando...',
+          text: 'Por favor, espere.',
+          didOpen: () => {
+            Swal.showLoading();
+          },
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          allowEnterKey: false
+        });
+
         const respuesta = await axios.get(url);
 
         if (respuesta.status === 200) {
+
+          Swal.close();
           console.log(respuesta.data);
           this.datos = respuesta.data;
           this.configurarGraficas();
-          this.fechaDesdeActual = moment(this.fechaDesde).format('YYYY-MM-DD')
+          this.fechaDesdeActual = moment(`${this.anioSeleccionado}-${this.mesSeleccionado}-01`).format('YYYY-MM-DD');
+          this.obtenerFechaReporte();
         }
       } catch (error) {
+        Swal.close();
         this.manejarError(error);
+      }
+    },
+
+    async seleccionarMesAnio() {
+      try {
+        const { value: fechaSeleccionada } = await Swal.fire({
+          title: 'Selecciona mes y año',
+          html: `
+          <label for="swal-mes">Mes:</label>
+          <select id="swal-mes" class="swal2-input">
+            ${Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('')}
+          </select>
+          <label for="swal-anio">Año:</label>
+          <input id="swal-anio" type="number" class="swal2-input" min="2000" max="${new Date().getFullYear()}" value="${new Date().getFullYear()}">`,
+          focusConfirm: false,
+          confirmButtonText: 'Consultar',
+          preConfirm: () => {
+            const mes = document.getElementById('swal-mes').value;
+            const anio = document.getElementById('swal-anio').value;
+
+            if (!mes || !anio) {
+              Swal.showValidationMessage("Debes seleccionar un mes y un año");
+              return false;
+            }
+
+            return { mes, anio };
+          }
+        });
+
+        if (fechaSeleccionada) {
+          this.mesSeleccionado = fechaSeleccionada.mes;
+          this.anioSeleccionado = fechaSeleccionada.anio;
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error('Error al obtener mes y año: ', error);
+        return false;
+      }
+    },
+    async consultarFechas() {
+      if (await this.seleccionarMesAnio()) {
+        this.consultarVentas();
       }
     },
     convertirAFechaMexicoCentral(fechaUTC) {
@@ -183,7 +248,6 @@ export default {
         currency: 'MXN',
         minimumFractionDigits: 2
       });
-
 
       this.graficas.ventasPorSemestre = new Chart(document.getElementById('ventasPorSemestre').getContext('2d'), {
         type: 'bar',
@@ -237,7 +301,7 @@ export default {
         }
       });
 
-    
+
       this.graficas.ventasPorSemana2 = new Chart(document.getElementById('ventasPorSemana2').getContext('2d'), {
         type: 'doughnut',
         data: {
@@ -289,7 +353,7 @@ export default {
           responsive: true
         }
       });
-      
+
       this.graficas.ventasPorSemana4 = new Chart(document.getElementById('ventasPorSemana4').getContext('2d'), {
         type: 'doughnut',
         data: {
@@ -315,7 +379,7 @@ export default {
           responsive: true
         }
       });
-    
+
       console.log(this.datos.ventasPorTipoUltimoMes.map(item => item.tipo))
       this.graficas.ventasPorTipoMes = new Chart(document.getElementById('ventasPorTipoMes').getContext('2d'), {
         type: 'doughnut',
@@ -390,9 +454,7 @@ export default {
             y: {
               ticks: {
                 // eslint-disable-next-line no-unused-vars
-                callback: function (value, index, values) {
-                  return currencyFormatter.format(value);
-                }
+
               }
             }
           },
@@ -403,10 +465,9 @@ export default {
       );
 
     },
-    calcularInicioSemana(fecha, semana) {
-      let momento = moment(fecha).subtract(4, "weeks");
-      let inicioSemana = momento.startOf('isoWeek');
-      return inicioSemana.add((semana - 1) * 7, 'days').format('YYYY-MM-DD');
+    obtenerFechaReporte() {
+      moment.locale('es')
+      this.encabezado = moment(this.fechaDesdeActual).format('MMMM YYYY')
     },
     destruirGraficas() {
       Object.keys(this.graficas).forEach(key => {
@@ -416,25 +477,35 @@ export default {
         }
       });
     },
+    calcularInicioSemana(fecha, semana) {
+      let momento = moment(fecha).subtract(4, "weeks");
+      let inicioSemana = momento.startOf('isoWeek');
+      return inicioSemana.add((semana - 1) * 7, 'days').format('YYYY-MM-DD');
+    },
     descargarReporte() {
+      moment.locale('es');
+      const currencyFormatter = new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN',
+        minimumFractionDigits: 2
+      });
       const doc = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
         format: 'a4'
       });
 
-      // Ventas por los últimos seis meses
       doc.setFontSize(10);
       doc.setFontSize(12);
-      doc.text(`Reporte de Ventas ${moment(this.fechaDesde).format('YYYY-MM-DD')}`, 14, 20);
+      doc.text(`Reporte de ventas ${moment(this.fechaDesde).format('MMMM YYYY')}`, 14, 20);
 
       // Ventas por los últimos seis meses
       doc.setFontSize(10);
-      doc.text('Ventas por los últimos seis meses', 14, 30);
+      doc.text('Ventas del último semestre', 14, 30);
       const columnasVentasMeses = ['Mes', 'Total de Ventas ($)'];
       const registrosVentasMeses = this.datos.ventasPorSemestre.map(registro => [
         registro.mes || 'N/A',
-        `$${registro.total.toLocaleString()}`
+        currencyFormatter.format(registro.total)
       ]);
       doc.autoTable({
         startY: 35,
@@ -443,38 +514,47 @@ export default {
         theme: 'grid'
       });
 
-      let totalSemestre = registrosVentasMeses.reduce((acc, item) => acc + parseFloat(item[1].replace('$', '').replace(',', '')), 0);
+      let totalSemestre = this.datos.ventasPorSemestre.reduce((acc, item) => acc + item.total, 0);
       let startY = doc.previousAutoTable.finalY + 10;
-      doc.text(`Total ventas del semestre: $${totalSemestre.toLocaleString()}`, 14, startY);
+      doc.text(`Total ventas del semestre: ${currencyFormatter.format(totalSemestre)}`, 14, startY);
 
-      startY += 10;
+      startY += 15;
 
-      doc.text('Ventas por las últimas 4 semanas', 14, startY);
-
-      startY += 10;
-      // Función para agregar ventas semanales
-      this.datos.ventasPorSemanas.forEach((semana, index) => {
-        let fechaInicioSemana = this.calcularInicioSemana(this.fechaDesde, index + 1);
-        doc.text(`Ventas Semana ${index + 1} (Inicio: ${fechaInicioSemana})`, 14, startY + 10);
-        const columnasVentasDias = ['Día', 'Total de Ventas ($)'];
-        const registrosVentasDias = semana.labels.map((label, idx) => [label, `$${semana.data[idx].toLocaleString()}`]);
+      // Ventas individuales por las últimas 4 semanas
+      doc.text('Ventas del mes', 14, startY);
+      startY += 5; // Añadir un poco de espacio extra
+      // eslint-disable-next-line no-unused-vars
+      this.datos.ventasIndividualesCuatroSemanas.forEach((semana, index) => {
+        doc.text(`Semana (${semana.periodo})`, 14, startY);
+        const columnasVentasInd = ['ID Pedido', 'Tipo', 'Concepto', 'Fecha', 'Total ($)', 'Productos'];
+        const registrosVentasInd = semana.registros.map(registro => [
+          (registro.concepto !== 'Venta en inventario.' && registro.id_pedido) ? registro.id_pedido : 'N/A',
+          registro.tipo,
+          registro.concepto,
+          registro.fecha,
+          currencyFormatter.format(registro.total),
+          registro.productos.map(prod => `${prod.nombre} (x${prod.cantidad})`).join(', ')
+        ]);
         doc.autoTable({
-          startY: startY + 15,
-          head: [columnasVentasDias],
-          body: registrosVentasDias,
+          startY: startY + 5,
+          head: [columnasVentasInd],
+          body: registrosVentasInd,
           theme: 'grid'
         });
-        startY = doc.previousAutoTable.finalY + 10;
-        doc.text(`Total por la semana ${index + 1}: $${semana.data.reduce((acc, val) => acc + val, 0).toLocaleString()}`, 14, startY);
-        startY += 10;
+
+        let totalSemana = semana.registros.reduce((acc, registro) => acc + registro.total, 0);
+        startY = doc.previousAutoTable.finalY + 5;
+        doc.text(`Total de la semana: ${currencyFormatter.format(totalSemana)}`, 14, startY);
+
+        startY += 15;
       });
 
       // Ventas por tipo en el último mes
-      doc.text('Ventas por tipo en el último mes', 14, startY);
+      doc.text('Ventas por tipo', 14, startY);
       const columnasTipo = ['Tipo de Venta', 'Total de Ventas ($)'];
       const registrosVentasTipo = this.datos.ventasPorTipoUltimoMes.map(registro => [
         registro.tipo || 'N/A',
-        `$${registro.total}`
+        currencyFormatter.format(registro.total)
       ]);
       doc.autoTable({
         startY: startY + 5,
@@ -483,14 +563,19 @@ export default {
         theme: 'grid'
       });
 
-      startY = doc.previousAutoTable.finalY + 10;
+      
+      startY = doc.previousAutoTable.finalY + 5;
+      
+
+      startY += 15;
 
       // Ventas por producto en el último mes
-      doc.text('Ventas por producto en el último mes', 14, startY);
-      const columnasProducto = ['Producto', 'Total de Ventas ($)'];
+      doc.text('Ventas por producto', 14, startY);
+      const columnasProducto = ['Producto', 'Cantidad', 'Total de Ventas ($)'];
       const registrosVentasProductos = this.datos.ventasPorProductoUltimoMes.map(registro => [
         registro.producto || 'N/A',
-        `$${parseFloat(registro.total)}`
+        `${registro.cantidad}`,
+        currencyFormatter.format(registro.total)
       ]);
       doc.autoTable({
         startY: startY + 5,
@@ -499,10 +584,13 @@ export default {
         theme: 'grid'
       });
 
-      startY = doc.previousAutoTable.finalY + 10;
+    
+      startY = doc.previousAutoTable.finalY + 5;
+
+      startY += 15;
 
       // Gastos e ingresos de insumos en el último mes
-      doc.text('Gastos e ingresos de insumos en el último mes', 14, startY);
+      doc.text('Gastos e ingresos de insumos', 14, startY);
       const columnasInsumos = ['Insumo', 'Ingresos', 'Gastos'];
       const registrosGastosInsumos = this.datos.InsumosIngresadosVSConsumidos.map(registro => [
         registro.nombre || 'N/A',
@@ -517,22 +605,22 @@ export default {
       });
 
       // Guardar el PDF
-      const nombreArchivo = `Reporte_Ventas_${moment(this.fechaDesde).format('YYYY-MM-DD')}.pdf`;
+      const nombreArchivo = `Reporte_Ventas_${moment(this.fechaDesde).format('MMMM_YYYY')}.pdf`;
       doc.save(nombreArchivo);
     },
+
     filtrarPorFecha(fecha) {
       console.log("Filtrar por fecha:", fecha);
     },
     totalDias(total, element) {
       return total + element;
     },
+
     manejarError(error) {
       console.error('Error:', error);
     }
   },
   mounted() {
-    this.fechaDesde = moment();
-    this.fechaDesdeActual = moment(this.fechaDesde).format('YYYY-MM-DD')
     this.consultarVentas();
   }
 };

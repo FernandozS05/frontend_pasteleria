@@ -15,7 +15,7 @@ import apiCliente from "@/config/ServidorCliente";
 import axios from "@/config/axios.js";
 import toastConf from "@/config/toast";
 import BarraNavegacion from "@/components/Barras/BarraNavegacion.vue";
-
+import { useRoute } from 'vue-router';
 export default {
   name: "ElementoPedidoView",
   components: {
@@ -23,7 +23,10 @@ export default {
     BarraNavegacion
   },
   data() {
+    const route = useRoute();
+    const idPedido = route.params.id;
     return {
+      idPedido: idPedido,
       pedido: {},
       entrega: {},
       pagoAnticipo: {},
@@ -33,7 +36,7 @@ export default {
   },
   methods: {
     consultarInfo() {
-      const url = apiCliente.detallesPedido + `${localStorage.getItem("idPedido")}`;
+      const url = apiCliente.detallesPedido + `${this.idPedido}`;
 
       toast.promise(
         axios.get(url),
