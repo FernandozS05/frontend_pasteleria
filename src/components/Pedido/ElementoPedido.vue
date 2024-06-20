@@ -241,7 +241,7 @@ export default {
     },
     async consultarModificacion() {
       try {
-        if(this.detalles.estado == 'Cancelado'){
+        if(this.detalles.estado == 'Cancelado' || this.detalles.estado == 'No entregado' || this.detalles.estado == 'Entregado'){
           this.modificacion_autorizada = false;
           return
         }

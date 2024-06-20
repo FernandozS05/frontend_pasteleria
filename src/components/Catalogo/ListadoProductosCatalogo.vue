@@ -68,7 +68,7 @@ export default {
         Swal.fire({
             icon: "info",
             title: "No encontrados",
-            text: "No hay ningun producto.",
+            text: "No hay ningún producto.",
           });
       }
     },

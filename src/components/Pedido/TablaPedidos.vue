@@ -38,7 +38,7 @@
             <p class="fs-5">{{ obtenerFechaEntrega(pedido.id_entrega) }}</p>
           </td>
           <td class="ps-5" :class="getRowClass(pedido)">
-            <p v-if="pedido.id_liquidacion != null || pedido.estado == 'Cancelado'" class="fs-5">No disponible</p>
+            <p v-if="pedido.id_liquidacion != null || pedido.estado == 'Cancelado' || pedido.estado == 'No entregado'" class="fs-5">No disponible</p>
             <button v-else type="button" class="btn btn-primary btn-sm" @click="pagar(index)">
               Pagar
             </button>
